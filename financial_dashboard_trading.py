@@ -4,6 +4,7 @@
 
 @author: 
 """
+
 # 找到模組code/位置
 import os
 import sys
@@ -15,12 +16,12 @@ except NameError:
 
 sys.path.append(os.path.join(BP,'code'))
 
+
 # 載入必要模組
 #import haohaninfo
 #from order_Lo8 import Record
 import numpy as np
 #from talib.abstract import SMA,EMA, WMA, RSI, BBANDS, MACD
-#import sys
 import indicator_f_Lo2_short,datetime, indicator_forKBar_short
 import pandas as pd
 import streamlit as st 
@@ -51,7 +52,6 @@ def load_data(path):
 
 
 ###### 選擇金融商品
-
 d='./data/'
 st.subheader("選擇金融商品: ")
 # choices = ['台積電: 2022.1.1 至 2024.4.9', '大台指2024.12到期: 2024.1 至 2024.4.9']
@@ -733,7 +733,8 @@ if choice_strategy == choices_strategies[0]:
 # OrderRecord.GetTradeRecord()          ## 交易紀錄清單
 # OrderRecord.GetProfit()               ## 利潤清單
 
-
+#%%
+##### 定義計算績效函數:
 def 計算績效_股票():
     交易總盈虧 = OrderRecord.GetTotalProfit()*1000          ## 取得交易總盈虧
     平均每次盈虧 = OrderRecord.GetAverageProfit()*1000         ## 取得交易 "平均" 盈虧(每次)
@@ -785,8 +786,8 @@ def 計算績效_小台指期貨():
 
 
 
-
-
+#%%
+##### 根據不同類別金融產品選擇不同績效函數並計算績效(股票, 股票期貨, 大台指, 小台指)
 if choice == choices[0] :   ##'台積電: 2022.1.1 至 2024.4.9':
     交易總盈虧,平均每次盈虧,平均投資報酬率,平均獲利_只看獲利的,平均虧損_只看虧損的,勝率,最大連續虧損,最大盈虧回落_MDD,報酬風險比 = 計算績效_股票()
     # 交易總盈虧 = OrderRecord.GetTotalProfit()*1000          ## 取得交易總盈虧
@@ -856,6 +857,8 @@ if choice == choices[4] :   #'堤維西2020.1.2 至 2024.4.12':
 # OrderRecord.GetCumulativeProfit()         ## 累計盈虧
 # OrderRecord.GetCumulativeProfit_rate()    ## 累計投資報酬率
 
+
+#%%  
 ##### 将投資績效存储成一个DataFrame並以表格形式呈現各項績效數據
 if len(OrderRecord.Profit)>0:
     data = {
@@ -872,7 +875,7 @@ else:
 
 
 
-
+#%%
 # ###### 累計盈虧 & 累計投資報酬率
 # with st.expander("累計盈虧 & 累計投資報酬率"):
 #     fig4 = make_subplots(specs=[[{"secondary_y": True}]])
@@ -897,17 +900,17 @@ else:
 
 
 
-
+#%%
 ##### 畫累計盈虧圖:
-if choice == '台積電: 2022.1.1 至 2024.4.9':
+if choice == choices[0] :     ##'台積電: 2022.1.1 至 2024.4.9':
     OrderRecord.GeneratorProfitChart(choice='stock',StrategyName='MA')
-if choice == '大台指期貨2024.12到期: 2023.12 至 2024.4.11':
+if choice == choices[1] :                 ##'大台指期貨2024.12到期: 2023.12 至 2024.4.11':
     OrderRecord.GeneratorProfitChart(choice='future1',StrategyName='MA')
-if choice == '小台指期貨2024.12到期: 2023.12 至 2024.4.11':
+if choice == choices[2] :                            ##'小台指期貨2024.12到期: 2023.12 至 2024.4.11':
     OrderRecord.GeneratorProfitChart(choice='future2',StrategyName='MA')
-if choice == '英業達2020.1.2 至 2024.4.12':
+if choice == choices[3] :                                        ##'英業達2020.1.2 至 2024.4.12':
     OrderRecord.GeneratorProfitChart(choice='stock',StrategyName='MA')
-if choice == '堤維西2020.1.2 至 2024.4.12':
+if choice == choices[4] :                                                    ##'堤維西2020.1.2 至 2024.4.12':
     OrderRecord.GeneratorProfitChart(choice='stock',StrategyName='MA')
 
     
@@ -962,7 +965,7 @@ if choice == '堤維西2020.1.2 至 2024.4.12':
 
 
 
-
+#%%
 ##### 畫累計投資報酬率圖:
 OrderRecord.GeneratorProfit_rateChart(StrategyName='MA')
 # matplotlib.rcParams['font.family'] = 'Noto Sans CJK JP'
