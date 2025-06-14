@@ -30,7 +30,7 @@ from order_streamlit import Record
 import matplotlib.pyplot as plt
 import matplotlib
 
-from datetime import date,datetime #日曆
+from datetime import date,datetime,time #日曆
 
 #%%
 ####### (1) 開始設定 #######
