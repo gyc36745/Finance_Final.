@@ -25,7 +25,7 @@ import indicator_f_Lo2_short, indicator_forKBar_short
 import pandas as pd
 import streamlit as st 
 import streamlit.components.v1 as stc 
-from order_streamlit import Record
+from order_streamlit import Record, run_strategy
 
 import matplotlib.pyplot as plt
 import matplotlib
@@ -1027,49 +1027,6 @@ OrderRecord.GeneratorProfit_rateChart(StrategyName='MA')
 # st.pyplot(plt)
 
 #%%最佳化
-def run_strategy(KBar_df, short_period, long_period, MoveStopLoss, OrderRecord):
-    # 計算均線
-    KBar_df['MA_short'] = KBar_df['close'].rolling(window=short_period).mean()
-    KBar_df['MA_long'] = KBar_df['close'].rolling(window=long_period).mean()
-    
-    Order_Quantity = 1  # 每筆下單口數
-    StopLossPoint = 0
-    OrderPrice = 0
-
-    for n in range(1, len(KBar_df['time']) - 1):
-        if not np.isnan(KBar_df['MA_long'][n - 1]):
-            # 無部位進場
-            if OrderRecord.GetOpenInterest() == 0:
-                if KBar_df['MA_short'][n - 1] <= KBar_df['MA_long'][n - 1] and KBar_df['MA_short'][n] > KBar_df['MA_long'][n]:
-                    OrderRecord.Order('Buy', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], Order_Quantity)
-                    OrderPrice = KBar_df['open'][n+1]
-                    StopLossPoint = OrderPrice - MoveStopLoss
-                    continue
-                if KBar_df['MA_short'][n - 1] >= KBar_df['MA_long'][n - 1] and KBar_df['MA_short'][n] < KBar_df['MA_long'][n]:
-                    OrderRecord.Order('Sell', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], Order_Quantity)
-                    OrderPrice = KBar_df['open'][n+1]
-                    StopLossPoint = OrderPrice + MoveStopLoss
-                    continue
-            # 多單出場
-            elif OrderRecord.GetOpenInterest() > 0:
-                if KBar_df['product'][n+1] != KBar_df['product'][n]:
-                    OrderRecord.Cover('Sell', KBar_df['product'][n], KBar_df['time'][n], KBar_df['close'][n], OrderRecord.GetOpenInterest())
-                    continue
-                if KBar_df['close'][n] - MoveStopLoss > StopLossPoint:
-                    StopLossPoint = KBar_df['close'][n] - MoveStopLoss
-                elif KBar_df['close'][n] < StopLossPoint:
-                    OrderRecord.Cover('Sell', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], OrderRecord.GetOpenInterest())
-                    continue
-            # 空單出場
-            elif OrderRecord.GetOpenInterest() < 0:
-                if KBar_df['product'][n+1] != KBar_df['product'][n]:
-                    OrderRecord.Cover('Buy', KBar_df['product'][n], KBar_df['time'][n], KBar_df['close'][n], -OrderRecord.GetOpenInterest())
-                    continue
-                if KBar_df['close'][n] + MoveStopLoss < StopLossPoint:
-                    StopLossPoint = KBar_df['close'][n] + MoveStopLoss
-                elif KBar_df['close'][n] > StopLossPoint:
-                    OrderRecord.Cover('Buy', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], -OrderRecord.GetOpenInterest())
-                    continue
 
 
 
@@ -1101,6 +1058,48 @@ for short_p, long_p, sl in itertools.product(short_range, long_range, stoploss_r
 
 print("最佳參數：", best_params)
 print("最高獲利：", best_profit)
+
+
+
+# -- 執行最佳化邏輯 --
+if optimize:
+    best_profit = -np.inf
+    best_params = None
+    results = []
+
+    for short, long in product(range(short_range[0], short_range[1]+1), range(long_range[0], long_range[1]+1)):
+        if short >= long:
+            continue
+        for sl in sl_values:
+            record = Record()
+            df_copy = KBar_df.copy()
+            run_strategy(df_copy, short, long, sl, record)
+            profit = record.GetTotalProfit()
+            results.append((short, long, sl, profit))
+
+            if profit > best_profit:
+                best_profit = profit
+                best_params = (short, long, sl)
+
+    # -- 顯示最佳參數 --
+    st.success(f"最佳參數：短MA={best_params[0]}, 長MA={best_params[1]}, 停損={best_params[2]}，總獲利={best_profit:.2f}")
+
+    # -- 顯示所有結果表格 --
+    df_result = pd.DataFrame(results, columns=["short_MA", "long_MA", "StopLoss", "TotalProfit"])
+    st.subheader("所有參數組合績效")
+    st.dataframe(df_result.sort_values(by="TotalProfit", ascending=False).reset_index(drop=True))
+
+    # -- 繪圖（可選） --
+    import altair as alt
+    chart = alt.Chart(df_result).mark_circle(size=60).encode(
+        x='short_MA:Q',
+        y='long_MA:Q',
+        color='TotalProfit:Q',
+        tooltip=['short_MA', 'long_MA', 'StopLoss', 'TotalProfit']
+    ).interactive()
+
+    st.altair_chart(chart, use_container_width=True)
+
 #%%
 ####### (7) 呈現即時資料 #######
 
