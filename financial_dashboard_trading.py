@@ -104,10 +104,13 @@ else:
     st.error("請選擇有效的開始與結束日期。")
 	
 ## 轉變為datetime object.
-start_date = pd.to_datetime(start_date)
-end_date = pd.to_datetime(end_date)
-#start_date = datetime.strptime(start_date,'%Y-%m-%d')
-#end_date = datetime.strptime(end_date,'%Y-%m-%d')
+if isinstance(start_date, date) and not isinstance(start_date, datetime):
+    start_date = datetime.combine(start_date, time.min)
+if isinstance(end_date, date) and not isinstance(end_date, datetime):
+    end_date = datetime.combine(end_date, time.min)
+#start_date = pd.to_datetime(start_date)
+#end_date = pd.to_datetime(end_date)
+
 ## 使用条件筛选选择时间区间的数据
 df = df_original[(df_original['time'] >= start_date) & (df_original['time'] <= end_date)]
 
