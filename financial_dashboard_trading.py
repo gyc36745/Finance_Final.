@@ -50,7 +50,7 @@ def load_data(path):
 # ##### 讀取 excel 檔
 # df_original = pd.read_excel("kbars_2330_2022-01-01-2022-11-18.xlsx")
 
-
+'''
 ###### 選擇金融商品
 d='./data/'
 st.subheader("選擇金融商品: ")
@@ -83,7 +83,26 @@ elif choice == choices[4] :                                                     
 elif choice == choices[5] :                                                       ##'堤維西2020.1.2 至 2024.4.12':
     df_original = load_data(d+'kbars_1d_0050_2020-01-02_To_2025-03-10.pkl')
     product_name = '元大台灣0050'
+'''
+data_map = {
+    '台積電: 2022.1.1 至 2024.4.9': ('kbars_2330_2022-01-01-2024-04-09.pkl', '台積電2330'),
+    '大台指期貨2024.12到期: 2023.12 至 2024.4.11': ('kbars_TXF202412_2023-12-21-2024-04-11.pkl', '大台指期貨'),
+    '小台指期貨2024.12到期: 2023.12 至 2024.4.11': ('kbars_MXF202412_2023-12-21-2024-04-11.pkl', '小台指期貨'),
+    '英業達2020.1.2 至 2024.4.12': ('kbars_2356_2020-01-01-2024-04-12.pkl', '英業達2356'),
+    '堤維西2020.1.2 至 2024.4.12': ('kbars_1522_2020-01-01-2024-04-12.pkl', '堤維西1522'),
+    '元大台灣2020.01.02 至 2025.03.10': ('kbars_1d_0050_2020-01-02_To_2025-03-10.pkl', '元大台灣0050')
+}
 
+# 將選項列出給使用者
+choices = list(data_map.keys())
+choice = st.selectbox("選擇金融商品:", choices)
+
+# 安全載入對應檔案
+if choice in data_map:
+    filename, product_name = data_map[choice]
+    df_original = load_data(d + filename)
+else:
+    st.error("找不到選擇的商品對應的資料")
 
 
 
