@@ -1013,7 +1013,35 @@ OrderRecord.GeneratorProfit_rateChart(StrategyName='MA')
 # ### 在Streamlit中显示
 # st.pyplot(plt)
 
+#最佳化
+period_range_Long = range(st.slider('長均線範圍起點', 20, 200, 60),
+                          st.slider('長均線範圍終點', 60, 300, 120), 5)
+period_range_Short = range(st.slider('短均線範圍起點', 5, 50, 10),
+                           st.slider('短均線範圍終點', 10, 80, 30), 5)
 
+if st.button("執行均線最佳化"):
+    with st.spinner("正在進行最佳化..."):
+        bestcapital, capital_series, (bestLong, bestShort) = optimizeMA(
+            OrderRecord=None,
+            KBar_dic=KBar_dic,
+            period_range_Long=period_range_Long,
+            period_range_Short=period_range_Short,
+            MoveStopLoss=10,
+            Order_Quantity=1,
+            isFuture='True' if '期貨' in product_name else 'False',
+            G_commission=0.0005  # 可調整
+        )
+        st.success(f"最佳參數：Short = {bestShort}, Long = {bestLong}，最終資金倍數：{bestcapital:.2f} 倍")
+
+import matplotlib.pyplot as plt
+
+st.subheader("最佳策略資本曲線")
+fig, ax = plt.subplots()
+ax.plot(capital_series, label=f'S:{bestShort} L:{bestLong}')
+ax.set_ylabel("累積報酬（倍數）")
+ax.set_xlabel("時間")
+ax.legend()
+st.pyplot(fig)
 #%%
 ####### (7) 呈現即時資料 #######
 
