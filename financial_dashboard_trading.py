@@ -125,13 +125,13 @@ if choice == choices[4] :                                                       
 ## 轉變為datetime object.
 #text
 
-#start_date = datetime.datetime.strptime(start_date,'%Y-%m-%d')
-#end_date = datetime.datetime.strptime(end_date,'%Y-%m-%d')
+start_date = datetime.datetime.strptime(start_date,'%Y-%m-%d')
+end_date = datetime.datetime.strptime(end_date,'%Y-%m-%d')
 
 
 #日曆
-start_date = datetime.combine(start_date,datetime.min.time())
-end_date = datetime.combine(start_date,datetime.max.time())
+#start_date = datetime.combine(start_date,datetime.min.time())
+#end_date = datetime.combine(start_date,datetime.max.time())
 
 
 ## 使用条件筛选选择时间区间的数据
