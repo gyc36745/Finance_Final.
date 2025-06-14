@@ -80,6 +80,9 @@ if choice == choices[3] :                                           ##'英業達
 if choice == choices[4] :                                                       ##'堤維西2020.1.2 至 2024.4.12':
     df_original = load_data(d+'kbars_1522_2020-01-01-2024-04-12.pkl')
     product_name = '堤維西1522'
+if choice == choices[5] :                                                       ##'堤維西2020.1.2 至 2024.4.12':
+    df_original = load_data(d+'kbars_1d_0050_2020-01-02_To_2025-03-10.pkl')
+    product_name = '元大台灣0050'
 
 
 
@@ -101,6 +104,9 @@ elif choice == choices[3]:  # 英業達
 elif choice == choices[4]:  # 堤維西
     default_start = date(2020, 1, 2)
     default_end = date(2024, 4, 12)
+elif choice == choices[5]:  # 元大台灣
+    default_start = date(2020, 1, 2)
+    default_end = date(2025, 3, 10)
 
 # 分開輸入開始與結束日期
 start_date = st.date_input("開始日期", value=default_start, min_value=default_start, max_value=default_end)
