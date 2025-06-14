@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 #from haohaninfo.MicroTest import microtest_db
 import numpy as np
-import time
+
 #import haohaninfo
 #GOC = haohaninfo.GOrder.GOCommand()
 #GOQ = haohaninfo.GOrder.GOQuote()
