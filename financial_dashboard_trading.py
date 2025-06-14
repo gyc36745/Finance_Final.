@@ -1062,7 +1062,7 @@ period_range_Long = range(st.slider('長均線範圍起點', 20, 200, 60),
 period_range_Short = range(st.slider('短均線範圍起點', 5, 50, 10),
                            st.slider('短均線範圍終點', 10, 80, 30), 5)
 
-
+st.subheader("策略參數最佳化")
 if st.button("執行均線最佳化"):
     with st.spinner("正在進行最佳化..."):
         bestcapital, capital_series, (bestLong, bestShort) = optimizeMA(
