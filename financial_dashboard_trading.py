@@ -1057,6 +1057,11 @@ def optimizeMA(OrderRecord,KBar_dic,period_range_Long, period_range_Short, MoveS
                 bestperiodShort=periodShort
     return bestcapital,bestCumulativeCapitalRate_series,(bestperiodLong,bestperiodShort)
 
+if '期貨' in product_name:
+    isFuture = 'True'
+else:
+    isFuture = 'False'
+
 
 if isFuture == 'True' or isFuture == 'true':
     G_commission = st.number_input(
