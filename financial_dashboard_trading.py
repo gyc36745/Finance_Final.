@@ -1057,6 +1057,21 @@ def optimizeMA(OrderRecord,KBar_dic,period_range_Long, period_range_Short, MoveS
                 bestperiodShort=periodShort
     return bestcapital,bestCumulativeCapitalRate_series,(bestperiodLong,bestperiodShort)
 
+
+if isFuture == 'True' or isFuture == 'true':
+    G_commission = st.number_input(
+        "請輸入期貨商品的手續費（建議：TXF=20, MXF=12.5, FXF=20）",
+        min_value=0.0,
+        max_value=100.0,
+        value=20.0,
+        step=0.5,
+        help="參考 https://reurl.cc/RYy7Vn"
+    ) / 10000  # 轉為比率（手續費 / 商品價值），例如 20 / 14000 ≈ 0.0014
+    OrderRecord = Record(G_spread=3.628e-4, G_tax=0.00002, G_commission=G_commission, isFuture=True)
+else:
+    G_commission = 0.001425
+    OrderRecord = Record(G_spread=3.628e-4, G_tax=0.003, G_commission=G_commission, isFuture=False)
+
 period_range_Long = range(st.slider('長均線範圍起點', 20, 200, 60),
                           st.slider('長均線範圍終點', 60, 300, 120), 5)
 period_range_Short = range(st.slider('短均線範圍起點', 5, 50, 10),
