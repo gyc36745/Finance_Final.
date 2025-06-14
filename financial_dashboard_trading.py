@@ -55,36 +55,7 @@ def load_data(path):
 d='./data/'
 st.subheader("選擇金融商品: ")
 # choices = ['台積電: 2022.1.1 至 2024.4.9', '大台指2024.12到期: 2024.1 至 2024.4.9']
-'''
-choices = ['台積電: 2022.1.1 至 2024.4.9', '大台指期貨2024.12到期: 2023.12 至 2024.4.11', '小台指期貨2024.12到期: 2023.12 至 2024.4.11', '英業達2020.1.2 至 2024.4.12', '堤維西2020.1.2 至 2024.4.12','元大台灣2020.01.02 至 2025.03.10']
-choice = st.selectbox('選擇金融商品', choices, index=0)
-##### 读取Pickle文件
-if choice == choices[0] :         ##'台積電: 2022.1.1 至 2024.4.9':
-    df_original = load_data(d+'kbars_2330_2022-01-01-2024-04-09.pkl')
-    product_name = '台積電2330'
-    # df_original = load_data('kbars_2330_2022-01-01-2024-04-09.pkl')
-    # df_original = load_data('kbars_2330_2022-01-01-2022-11-18.pkl')  
-    # df_original = pd.read_pickle('kbars_2330_2022-01-01-2022-11-18.pkl')
-    #df.columns  ## Index(['Unnamed: 0', 'time', 'open', 'low', 'high', 'close', 'volume','amount'], dtype='object')
-    # df_original = df_original.drop('Unnamed: 0',axis=1)
-# if choice == '大台指2024.12到期: 2024.1 至 2024.4.9':
-#     df_original = load_data('kbars_TXF202412_2024-01-01-2024-04-09.pkl')  
-if choice == choices[1] :                   ##'大台指期貨2024.12到期: 2023.12 至 2024.4.11':
-    df_original = load_data(d+'kbars_TXF202412_2023-12-21-2024-04-11.pkl')
-    product_name = '大台指期貨'
-elif choice == choices[2] :                              ##'小台指期貨2024.12到期: 2023.12 至 2024.4.11':
-    df_original = load_data(d+'kbars_MXF202412_2023-12-21-2024-04-11.pkl')
-    product_name = '小台指期貨'
-elif choice == choices[3] :                                           ##'英業達2020.1.2 至 2024.4.12':
-    df_original = load_data(d+'kbars_2356_2020-01-01-2024-04-12.pkl')
-    product_name = '英業達2356'
-elif choice == choices[4] :                                                       ##'堤維西2020.1.2 至 2024.4.12':
-    df_original = load_data(d+'kbars_1522_2020-01-01-2024-04-12.pkl')
-    product_name = '堤維西1522'
-elif choice == choices[5] :                                                       ##'堤維西2020.1.2 至 2024.4.12':
-    df_original = load_data(d+'kbars_1d_0050_2020-01-02_To_2025-03-10.pkl')
-    product_name = '元大台灣0050'
-'''
+
 data_map = {
     '台積電: 2022.1.1 至 2024.4.9': ('kbars_2330_2022-01-01-2024-04-09.pkl', '台積電2330'),
     '大台指期貨2024.12到期: 2023.12 至 2024.4.11': ('kbars_TXF202412_2023-12-21-2024-04-11.pkl', '大台指期貨'),
@@ -94,16 +65,14 @@ data_map = {
     '元大台灣2020.01.02 至 2025.03.10': ('kbars_1d_0050_2020-01-02_To_2025-03-10.pkl', '元大台灣0050')
 }
 
-# 將選項列出給使用者
+# 列出選項(st)
 choices = list(data_map.keys())
 choice = st.selectbox("選擇金融商品:", choices)
 
-# 安全載入對應檔案
-if choice in data_map:
-    filename, product_name = data_map[choice]
-    df_original = load_data(d + filename)
-else:
-    st.error("找不到選擇的商品對應的資料")
+# 載入檔案
+filename, product_name = data_map[choice]
+df_original = load_data(d + filename)
+
 
 
 
