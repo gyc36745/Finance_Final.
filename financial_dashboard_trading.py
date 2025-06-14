@@ -25,8 +25,8 @@ import indicator_f_Lo2_short, indicator_forKBar_short
 import pandas as pd
 import streamlit as st 
 import streamlit.components.v1 as stc 
-#from order_streamlit import Record
-from order_streamlit import *
+from order_streamlit import Record
+
 import matplotlib.pyplot as plt
 import matplotlib
 from datetime import datetime, date, time
