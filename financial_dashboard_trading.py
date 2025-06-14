@@ -55,22 +55,32 @@ def load_data(path):
 d='./data/'
 st.subheader("選擇金融商品: ")
 # choices = ['台積電: 2022.1.1 至 2024.4.9', '大台指2024.12到期: 2024.1 至 2024.4.9']
+choices = ['台積電: 2022.1.1 至 2024.4.9', '大台指期貨2024.12到期: 2023.12 至 2024.4.11', '小台指期貨2024.12到期: 2023.12 至 2024.4.11', '英業達2020.1.2 至 2024.4.12', '堤維西2020.1.2 至 2024.4.12']
+choice = st.selectbox('選擇金融商品', choices, index=0)
+##### 读取Pickle文件
+if choice == choices[0] :         ##'台積電: 2022.1.1 至 2024.4.9':
+    df_original = load_data(d+'kbars_2330_2022-01-01-2024-04-09.pkl')
+    product_name = '台積電2330'
+    # df_original = load_data('kbars_2330_2022-01-01-2024-04-09.pkl')
+    # df_original = load_data('kbars_2330_2022-01-01-2022-11-18.pkl')  
+    # df_original = pd.read_pickle('kbars_2330_2022-01-01-2022-11-18.pkl')
+    #df.columns  ## Index(['Unnamed: 0', 'time', 'open', 'low', 'high', 'close', 'volume','amount'], dtype='object')
+    # df_original = df_original.drop('Unnamed: 0',axis=1)
+# if choice == '大台指2024.12到期: 2024.1 至 2024.4.9':
+#     df_original = load_data('kbars_TXF202412_2024-01-01-2024-04-09.pkl')  
+if choice == choices[1] :                   ##'大台指期貨2024.12到期: 2023.12 至 2024.4.11':
+    df_original = load_data(d+'kbars_TXF202412_2023-12-21-2024-04-11.pkl')
+    product_name = '大台指期貨'
+if choice == choices[2] :                              ##'小台指期貨2024.12到期: 2023.12 至 2024.4.11':
+    df_original = load_data(d+'kbars_MXF202412_2023-12-21-2024-04-11.pkl')
+    product_name = '小台指期貨'
+if choice == choices[3] :                                           ##'英業達2020.1.2 至 2024.4.12':
+    df_original = load_data(d+'kbars_2356_2020-01-01-2024-04-12.pkl')
+    product_name = '英業達2356'
+if choice == choices[4] :                                                       ##'堤維西2020.1.2 至 2024.4.12':
+    df_original = load_data(d+'kbars_1522_2020-01-01-2024-04-12.pkl')
+    product_name = '堤維西1522'
 
-data_map = {
-    '台積電: 2022.1.1 至 2024.4.9': ('kbars_2330_2022-01-01-2024-04-09.pkl', '台積電2330'),
-    '大台指期貨2024.12到期: 2023.12 至 2024.4.11': ('kbars_TXF202412_2023-12-21-2024-04-11.pkl', '大台指期貨'),
-    '小台指期貨2024.12到期: 2023.12 至 2024.4.11': ('kbars_MXF202412_2023-12-21-2024-04-11.pkl', '小台指期貨'),
-    '英業達2020.1.2 至 2024.4.12': ('kbars_2356_2020-01-01-2024-04-12.pkl', '英業達2356'),
-    '堤維西2020.1.2 至 2024.4.12': ('kbars_1522_2020-01-01-2024-04-12.pkl', '堤維西1522')
-}
-
-# 列出選項(st)
-choices = list(data_map.keys())
-choice = st.selectbox("選擇金融商品:", choices)
-
-# 載入檔案
-filename, product_name = data_map[choice]
-df_original = load_data(d + filename)
 
 
 
@@ -1014,10 +1024,44 @@ OrderRecord.GeneratorProfit_rateChart(StrategyName='MA')
 # st.pyplot(plt)
 
 #最佳化
+def optimizeMA(OrderRecord,KBar_dic,period_range_Long, period_range_Short, MoveStopLoss=10, Order_Quantity=1, isFuture='False', G_commission=0.001425):
+
+    openPrice=KBar_dic['open']
+    closePrice=KBar_dic['close']  
+    bestcapital=-1000000
+    bestcapital_series=[]
+    bestperiodLong=0
+    bestperiodShort=0
+    for periodLong in period_range_Long:
+        for periodShort in period_range_Short:
+            if(periodLong<=periodShort):
+                continue
+
+            ##
+            ### 重新建立部位管理物件 
+            if isFuture=='True' or isFuture=='true':   ## 期貨商品
+                OrderRecord=Record(G_spread=3.628e-4, G_tax=0.00002, G_commission=G_commission, isFuture=True)  ##  G_commission在各別期貨商品要重新計算=手續費價格(TW)/期貨商品價值(TW)
+            else: ## 股票商品:
+                OrderRecord=Record(G_spread=3.628e-4, G_tax=0.003, G_commission=0.001425, isFuture=False)
+
+
+            ##對訊號進行回測
+            CumulativeCapitalRate_series, final_return = back_test(OrderRecord, KBar_dic, periodLong, periodShort, MoveStopLoss, Order_Quantity)
+            #CumulativeCapitalRate_series, final_return = GetCumulativeCapitalRate_finalReturn(OrderRecord.Capital_rate)
+            #如果結果比之前更好,就記錄下來
+            if(bestcapital<(final_return+1)):
+                #print(f'old capital:{bestcapital}, new capital:{final_return+1}')
+                bestcapital = final_return+1
+                bestCumulativeCapitalRate_series = CumulativeCapitalRate_series
+                bestperiodLong=periodLong
+                bestperiodShort=periodShort
+    return bestcapital,bestCumulativeCapitalRate_series,(bestperiodLong,bestperiodShort)
+
 period_range_Long = range(st.slider('長均線範圍起點', 20, 200, 60),
                           st.slider('長均線範圍終點', 60, 300, 120), 5)
 period_range_Short = range(st.slider('短均線範圍起點', 5, 50, 10),
                            st.slider('短均線範圍終點', 10, 80, 30), 5)
+
 
 if st.button("執行均線最佳化"):
     with st.spinner("正在進行最佳化..."):
