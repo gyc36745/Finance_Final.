@@ -71,16 +71,16 @@ if choice == choices[0] :         ##'台積電: 2022.1.1 至 2024.4.9':
 if choice == choices[1] :                   ##'大台指期貨2024.12到期: 2023.12 至 2024.4.11':
     df_original = load_data(d+'kbars_TXF202412_2023-12-21-2024-04-11.pkl')
     product_name = '大台指期貨'
-if choice == choices[2] :                              ##'小台指期貨2024.12到期: 2023.12 至 2024.4.11':
+elif choice == choices[2] :                              ##'小台指期貨2024.12到期: 2023.12 至 2024.4.11':
     df_original = load_data(d+'kbars_MXF202412_2023-12-21-2024-04-11.pkl')
     product_name = '小台指期貨'
-if choice == choices[3] :                                           ##'英業達2020.1.2 至 2024.4.12':
+elif choice == choices[3] :                                           ##'英業達2020.1.2 至 2024.4.12':
     df_original = load_data(d+'kbars_2356_2020-01-01-2024-04-12.pkl')
     product_name = '英業達2356'
-if choice == choices[4] :                                                       ##'堤維西2020.1.2 至 2024.4.12':
+elif choice == choices[4] :                                                       ##'堤維西2020.1.2 至 2024.4.12':
     df_original = load_data(d+'kbars_1522_2020-01-01-2024-04-12.pkl')
     product_name = '堤維西1522'
-if choice == choices[5] :                                                       ##'堤維西2020.1.2 至 2024.4.12':
+elif choice == choices[5] :                                                       ##'堤維西2020.1.2 至 2024.4.12':
     df_original = load_data(d+'kbars_1d_0050_2020-01-02_To_2025-03-10.pkl')
     product_name = '元大台灣0050'
 
