@@ -1030,7 +1030,7 @@ OrderRecord.GeneratorProfit_rateChart(StrategyName='MA')
 
 
 st.subheader("策略參數最佳化")
-if st.button("執行均線最佳化"):
+
 
 #%%
 ####### (7) 呈現即時資料 #######
