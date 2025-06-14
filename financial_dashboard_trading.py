@@ -86,16 +86,25 @@ if choice == choices[4] :                                                       
 
 ###### 選擇資料區間
 st.subheader("選擇資料時間區間")
-if choice == choices[0] :                       ##'台積電: 2022.1.1 至 2024.4.9':
-    start_date, end_date = st.date_input("日期選擇範圍",[date(2022,1,1), date(2024,4,9)])  
-if choice == choices[1] :                                   ##'大台指期貨2024.12到期: 2023.12 至 2024.4.11':
-    start_date, end_date = st.date_input("日期選擇範圍",[date(2023,12,21), date(2024,4,11)])  
-if choice == choices[2] :                                               ##'小台指期貨2024.12到期: 2023.12 至 2024.4.11':
-    start_date, end_date = st.date_input("日期選擇範圍",[date(2023,12,21), date(2024,4,11)])  
-if choice == choices[3] :                                                ##'英業達2020.1.2 至 2024.4.12':
-    start_date, end_date = st.date_input("日期選擇範圍",[date(2023,1,2), date(2024,4,12)])  
-if choice == choices[4] :                                                             ##'堤維西2020.1.2 至 2024.4.12':
-    start_date, end_date = st.date_input("日期選擇範圍",[date(2020,1,2), date(2024,4,12)])  
+if choice == choices[0]:  # 台積電
+    default_start = date(2022, 1, 1)
+    default_end = date(2024, 4, 9)
+elif choice == choices[1]:  # 大台指期貨
+    default_start = date(2023, 12, 21)
+    default_end = date(2024, 4, 11)
+elif choice == choices[2]:  # 小台指期貨
+    default_start = date(2023, 12, 21)
+    default_end = date(2024, 4, 11)
+elif choice == choices[3]:  # 英業達
+    default_start = date(2020, 1, 2)
+    default_end = date(2024, 4, 12)
+elif choice == choices[4]:  # 堤維西
+    default_start = date(2020, 1, 2)
+    default_end = date(2024, 4, 12)
+
+# 分開輸入開始與結束日期
+start_date = st.date_input("開始日期", value=default_start, min_value=default_start, max_value=default_end)
+end_date = st.date_input("結束日期", value=default_end, min_value=default_start, max_value=default_end)
 
 
 	
