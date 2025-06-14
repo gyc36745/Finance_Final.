@@ -1023,7 +1023,7 @@ OrderRecord.GeneratorProfit_rateChart(StrategyName='MA')
 # ### 在Streamlit中显示
 # st.pyplot(plt)
 
-#最佳化
+#%%最佳化
 def optimizeMA(OrderRecord,KBar_dic,period_range_Long, period_range_Short, MoveStopLoss=10, Order_Quantity=1, isFuture='False', G_commission=0.001425):
 
     openPrice=KBar_dic['open']
