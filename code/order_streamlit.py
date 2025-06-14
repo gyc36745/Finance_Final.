@@ -15,6 +15,7 @@ class Record():
         self.G_spread = G_spread
         self.G_tax = G_tax
         self.G_commission = G_commission
+        self.isFuture = isFuture
         # 儲存績效
         self.Profit=[]
         self.Profit_rate=[]
