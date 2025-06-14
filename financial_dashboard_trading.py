@@ -1027,88 +1027,11 @@ OrderRecord.GeneratorProfit_rateChart(StrategyName='MA')
 # st.pyplot(plt)
 
 #%%最佳化
-def optimizeMA(OrderRecord,KBar_dic,period_range_Long, period_range_Short, MoveStopLoss=10, Order_Quantity=1, isFuture='False', G_commission=0.001425):
 
-    openPrice=KBar_dic['open']
-    closePrice=KBar_dic['close']  
-    bestcapital=-1000000
-    bestcapital_series=[]
-    bestperiodLong=0
-    bestperiodShort=0
-    for periodLong in period_range_Long:
-        for periodShort in period_range_Short:
-            if(periodLong<=periodShort):
-                continue
-
-            ##
-            ### 重新建立部位管理物件 
-            if isFuture=='True' or isFuture=='true':   ## 期貨商品
-                OrderRecord=Record(G_spread=3.628e-4, G_tax=0.00002, G_commission=G_commission, isFuture=True)  ##  G_commission在各別期貨商品要重新計算=手續費價格(TW)/期貨商品價值(TW)
-            else: ## 股票商品:
-                OrderRecord=Record(G_spread=3.628e-4, G_tax=0.003, G_commission=0.001425, isFuture=False)
-
-
-            ##對訊號進行回測
-            CumulativeCapitalRate_series, final_return = back_test(OrderRecord, KBar_dic, periodLong, periodShort, MoveStopLoss, Order_Quantity)
-            #CumulativeCapitalRate_series, final_return = GetCumulativeCapitalRate_finalReturn(OrderRecord.Capital_rate)
-            #如果結果比之前更好,就記錄下來
-            if(bestcapital<(final_return+1)):
-                #print(f'old capital:{bestcapital}, new capital:{final_return+1}')
-                bestcapital = final_return+1
-                bestCumulativeCapitalRate_series = CumulativeCapitalRate_series
-                bestperiodLong=periodLong
-                bestperiodShort=periodShort
-    return bestcapital,bestCumulativeCapitalRate_series,(bestperiodLong,bestperiodShort)
-
-if '期貨' in product_name:
-    isFuture = 'True'
-else:
-    isFuture = 'False'
-
-
-if isFuture == 'True' or isFuture == 'true':
-    G_commission = st.number_input(
-        "請輸入期貨商品的手續費（建議：TXF=20, MXF=12.5, FXF=20）",
-        min_value=0.0,
-        max_value=100.0,
-        value=20.0,
-        step=0.5,
-        help="參考 https://reurl.cc/RYy7Vn"
-    ) / 10000  # 轉為比率（手續費 / 商品價值），例如 20 / 14000 ≈ 0.0014
-    OrderRecord = Record(G_spread=3.628e-4, G_tax=0.00002, G_commission=G_commission, isFuture=True)
-else:
-    G_commission = 0.001425
-    OrderRecord = Record(G_spread=3.628e-4, G_tax=0.003, G_commission=G_commission, isFuture=False)
-
-period_range_Long = range(st.slider('長均線範圍起點', 20, 200, 60),
-                          st.slider('長均線範圍終點', 60, 300, 120), 5)
-period_range_Short = range(st.slider('短均線範圍起點', 5, 50, 10),
-                           st.slider('短均線範圍終點', 10, 80, 30), 5)
 
 st.subheader("策略參數最佳化")
 if st.button("執行均線最佳化"):
-    with st.spinner("正在進行最佳化..."):
-        bestcapital, capital_series, (bestLong, bestShort) = optimizeMA(
-            OrderRecord=None,
-            KBar_dic=KBar_dic,
-            period_range_Long=period_range_Long,
-            period_range_Short=period_range_Short,
-            MoveStopLoss=10,
-            Order_Quantity=1,
-            isFuture='True' if '期貨' in product_name else 'False',
-            G_commission=0.0005  # 可調整
-        )
-        st.success(f"最佳參數：Short = {bestShort}, Long = {bestLong}，最終資金倍數：{bestcapital:.2f} 倍")
 
-import matplotlib.pyplot as plt
-
-st.subheader("最佳策略資本曲線")
-fig, ax = plt.subplots()
-ax.plot(capital_series, label=f'S:{bestShort} L:{bestLong}')
-ax.set_ylabel("累積報酬（倍數）")
-ax.set_xlabel("時間")
-ax.legend()
-st.pyplot(fig)
 #%%
 ####### (7) 呈現即時資料 #######
 
