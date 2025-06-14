@@ -10,7 +10,11 @@ import streamlit as st
 
 # 下單部位管理物件
 class Record():
-    def __init__(self ):   ## 建構子
+    def __init__(self, G_spread=None, G_tax=None, G_commission=None):   ## 建構子
+        # 交易相關參數
+        self.G_spread = G_spread
+        self.G_tax = G_tax
+        self.G_commission = G_commission
         # 儲存績效
         self.Profit=[]
         self.Profit_rate=[]
