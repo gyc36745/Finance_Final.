@@ -87,22 +87,20 @@ if choice == choices[4] :                                                       
 ###### 選擇資料區間
 st.subheader("選擇資料時間區間")
 if choice == choices[0] :                       ##'台積電: 2022.1.1 至 2024.4.9':
-    start_date, end_date = st.date_input("日期選擇範圍",[date(2022,1,1), date(2024,4,9)])  
+    start_date = st.text_input('輸入開始日期(日期格式: 2022-01-01), 區間:2022-01-01 至 2024-04-09', '2022-01-01')
+    end_date = st.text_input('輸入結束日期 (日期格式: 2024-04-09), 區間:2022-01-01 至 2024-04-09', '2024-04-09')
 if choice == choices[1] :                                   ##'大台指期貨2024.12到期: 2023.12 至 2024.4.11':
-    start_date, end_date = st.date_input("日期選擇範圍",[date(2023,12,21), date(2024,4,11)])  
+    start_date = st.text_input('輸入開始日期(日期格式: 2023-12-21), 區間:2023-12-21 至 2024-04-11', '2023-12-21')
+    end_date = st.text_input('輸入結束日期 (日期格式: 2024-04-11), 區間:2023-12-21 至 2024-04-11', '2024-04-11')
 if choice == choices[2] :                                               ##'小台指期貨2024.12到期: 2023.12 至 2024.4.11':
-    start_date, end_date = st.date_input("日期選擇範圍",[date(2023,12,21), date(2024,4,11)])  
+    start_date = st.text_input('輸入開始日期(日期格式: 2023-12-21), 區間:2023-12-21 至 2024-04-11', '2023-12-21')
+    end_date = st.text_input('輸入結束日期 (日期格式: 2024-04-11), 區間:2023-12-21 至 2024-04-11', '2024-04-11')
 if choice == choices[3] :                                                ##'英業達2020.1.2 至 2024.4.12':
-    start_date, end_date = st.date_input("日期選擇範圍",[date(2023,1,2), date(2024,4,12)])  
+    start_date = st.text_input('輸入開始日期(日期格式: 2020-01-02), 區間:2020-01-02 至 2024-04-12', '2020-01-02')
+    end_date = st.text_input('輸入結束日期 (日期格式: 2024-04-12), 區間:2020-01-02 至 2024-04-12', '2024-04-12')
 if choice == choices[4] :                                                             ##'堤維西2020.1.2 至 2024.4.12':
-    start_date, end_date = st.date_input("日期選擇範圍",[date(2020,1,2), date(2024,4,12)])  
-
-# 安全轉換為 datetime（若未選擇兩個日期會顯示警告）
-if isinstance(start_date, date) and isinstance(end_date, date):
-    start_datetime = datetime.combine(start_date, datetime.min.time())
-    end_datetime = datetime.combine(end_date, datetime.max.time())
-else:
-    st.error("請選擇有效的開始與結束日期。")
+    start_date = st.text_input('輸入開始日期(日期格式: 2020-01-02), 區間:2020-01-02 至 2024-04-12', '2020-01-02')
+    end_date = st.text_input('輸入結束日期 (日期格式: 2024-04-12), 區間:2020-01-02 至 2024-04-12', '2024-04-12')
 
 ## 轉變為datetime object.
 start_date = datetime.datetime.strptime(start_date,'%Y-%m-%d')
