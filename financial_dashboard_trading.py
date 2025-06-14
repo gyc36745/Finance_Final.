@@ -109,16 +109,26 @@ if choice == choices[4] :                                                       
 
 #日曆
 
-if choice == choices[0] :                       ##'台積電: 2022.1.1 至 2024.4.9':
-    start_date, end_date = st.date_input("日期選擇範圍",[date(2022,1,1), date(2024,4,9)])  
-if choice == choices[1] :                                   ##'大台指期貨2024.12到期: 2023.12 至 2024.4.11':
-    start_date, end_date = st.date_input("日期選擇範圍",[date(2023,12,21), date(2024,4,11)])  
-if choice == choices[2] :                                               ##'小台指期貨2024.12到期: 2023.12 至 2024.4.11':
-    start_date, end_date = st.date_input("日期選擇範圍",[date(2023,12,21), date(2024,4,11)])  
-if choice == choices[3] :                                                ##'英業達2020.1.2 至 2024.4.12':
-    start_date, end_date = st.date_input("日期選擇範圍",[date(2023,1,2), date(2024,4,12)])  
-if choice == choices[4] :                                                             ##'堤維西2020.1.2 至 2024.4.12':
-    start_date, end_date = st.date_input("日期選擇範圍",[date(2020,1,2), date(2024,4,12)])  
+# 預設日期依選項指定
+if choice == choices[0]:  # 台積電
+    default_range = [date(2022,1,1), date(2024,4,9)]
+elif choice == choices[1]:  # 大台指期貨
+    default_range = [date(2023,12,21), date(2024,4,11)]
+elif choice == choices[2]:  # 小台指期貨
+    default_range = [date(2023,12,21), date(2024,4,11)]
+elif choice == choices[3]:  # 英業達
+    default_range = [date(2023,1,2), date(2024,4,12)]
+elif choice == choices[4]:  # 堤維西
+    default_range = [date(2020,1,2), date(2024,4,12)]
+
+# 單一輸入區，確保輸出為 2 個日期
+date_range = st.date_input("日期選擇範圍", default_range)
+
+if isinstance(date_range, tuple) and len(date_range) == 2:
+    start_date, end_date = date_range
+    st.write(f"你選擇的範圍是：{start_date} 至 {end_date}")
+else:
+    st.error("請選擇兩個日期（開始與結束）")
 
 
 
