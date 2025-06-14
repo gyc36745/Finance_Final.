@@ -5,7 +5,8 @@
 @author: 
 """
 
-# 找到模組code/位置
+# 載入必要模組
+
 import os
 import sys
 ##sys.path.append('./code')
@@ -16,8 +17,6 @@ except NameError:
 
 sys.path.append(os.path.join(BP,'code'))
 
-
-# 載入必要模組
 #import haohaninfo
 #from order_Lo8 import Record
 import numpy as np
@@ -29,8 +28,6 @@ import streamlit.components.v1 as stc
 from order_streamlit import Record
 import matplotlib.pyplot as plt
 import matplotlib
-
-from datetime import date,datetime #日曆
 
 #%%
 ####### (1) 開始設定 #######
@@ -88,8 +85,6 @@ if choice == choices[4] :                                                       
 
 ###### 選擇資料區間
 st.subheader("選擇資料時間區間")
-#輸入文字
-
 if choice == choices[0] :                       ##'台積電: 2022.1.1 至 2024.4.9':
     start_date = st.text_input('輸入開始日期(日期格式: 2022-01-01), 區間:2022-01-01 至 2024-04-09', '2022-01-01')
     end_date = st.text_input('輸入結束日期 (日期格式: 2024-04-09), 區間:2022-01-01 至 2024-04-09', '2024-04-09')
@@ -107,33 +102,9 @@ if choice == choices[4] :                                                       
     end_date = st.text_input('輸入結束日期 (日期格式: 2024-04-12), 區間:2020-01-02 至 2024-04-12', '2024-04-12')
 
 
-'''
-#日曆
-if choice == choices[0] :                       ##'台積電: 2022.1.1 至 2024.4.9':
-    start_date, end_date = st.date_input("日期選擇範圍",[date(2022,1,1), date(2024,4,9)])  
-if choice == choices[1] :                                   ##'大台指期貨2024.12到期: 2023.12 至 2024.4.11':
-    start_date, end_date = st.date_input("日期選擇範圍",[date(2023,12,21), date(2024,4,11)])  
-if choice == choices[2] :                                               ##'小台指期貨2024.12到期: 2023.12 至 2024.4.11':
-    start_date, end_date = st.date_input("日期選擇範圍",[date(2023,12,21), date(2024,4,11)])  
-if choice == choices[3] :                                                ##'英業達2020.1.2 至 2024.4.12':
-    start_date, end_date = st.date_input("日期選擇範圍",[date(2023,1,2), date(2024,4,12)])  
-if choice == choices[4] :                                                             ##'堤維西2020.1.2 至 2024.4.12':
-    start_date, end_date = st.date_input("日期選擇範圍",[date(2020,1,2), date(2024,4,12)])  
-'''
-
-
 ## 轉變為datetime object.
-#text
-
 start_date = datetime.datetime.strptime(start_date,'%Y-%m-%d')
 end_date = datetime.datetime.strptime(end_date,'%Y-%m-%d')
-
-
-#日曆
-#start_date = datetime.combine(start_date,datetime.min.time())
-#end_date = datetime.combine(start_date,datetime.max.time())
-
-
 ## 使用条件筛选选择时间区间的数据
 df = df_original[(df_original['time'] >= start_date) & (df_original['time'] <= end_date)]
 
