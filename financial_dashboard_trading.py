@@ -1027,11 +1027,80 @@ OrderRecord.GeneratorProfit_rateChart(StrategyName='MA')
 # st.pyplot(plt)
 
 #%%最佳化
+def run_strategy(KBar_df, short_period, long_period, MoveStopLoss, OrderRecord):
+    # 計算均線
+    KBar_df['MA_short'] = KBar_df['close'].rolling(window=short_period).mean()
+    KBar_df['MA_long'] = KBar_df['close'].rolling(window=long_period).mean()
+    
+    Order_Quantity = 1  # 每筆下單口數
+    StopLossPoint = 0
+    OrderPrice = 0
+
+    for n in range(1, len(KBar_df['time']) - 1):
+        if not np.isnan(KBar_df['MA_long'][n - 1]):
+            # 無部位進場
+            if OrderRecord.GetOpenInterest() == 0:
+                if KBar_df['MA_short'][n - 1] <= KBar_df['MA_long'][n - 1] and KBar_df['MA_short'][n] > KBar_df['MA_long'][n]:
+                    OrderRecord.Order('Buy', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], Order_Quantity)
+                    OrderPrice = KBar_df['open'][n+1]
+                    StopLossPoint = OrderPrice - MoveStopLoss
+                    continue
+                if KBar_df['MA_short'][n - 1] >= KBar_df['MA_long'][n - 1] and KBar_df['MA_short'][n] < KBar_df['MA_long'][n]:
+                    OrderRecord.Order('Sell', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], Order_Quantity)
+                    OrderPrice = KBar_df['open'][n+1]
+                    StopLossPoint = OrderPrice + MoveStopLoss
+                    continue
+            # 多單出場
+            elif OrderRecord.GetOpenInterest() > 0:
+                if KBar_df['product'][n+1] != KBar_df['product'][n]:
+                    OrderRecord.Cover('Sell', KBar_df['product'][n], KBar_df['time'][n], KBar_df['close'][n], OrderRecord.GetOpenInterest())
+                    continue
+                if KBar_df['close'][n] - MoveStopLoss > StopLossPoint:
+                    StopLossPoint = KBar_df['close'][n] - MoveStopLoss
+                elif KBar_df['close'][n] < StopLossPoint:
+                    OrderRecord.Cover('Sell', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], OrderRecord.GetOpenInterest())
+                    continue
+            # 空單出場
+            elif OrderRecord.GetOpenInterest() < 0:
+                if KBar_df['product'][n+1] != KBar_df['product'][n]:
+                    OrderRecord.Cover('Buy', KBar_df['product'][n], KBar_df['time'][n], KBar_df['close'][n], -OrderRecord.GetOpenInterest())
+                    continue
+                if KBar_df['close'][n] + MoveStopLoss < StopLossPoint:
+                    StopLossPoint = KBar_df['close'][n] + MoveStopLoss
+                elif KBar_df['close'][n] > StopLossPoint:
+                    OrderRecord.Cover('Buy', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], -OrderRecord.GetOpenInterest())
+                    continue
+
+
 
 
 st.subheader("策略參數最佳化")
 
+import itertools
 
+short_range = range(3, 10)
+long_range = range(10, 30, 5)
+stoploss_range = [5, 10, 15]
+
+best_profit = -float('inf')
+best_params = None
+
+for short_p, long_p, sl in itertools.product(short_range, long_range, stoploss_range):
+    if short_p >= long_p:
+        continue  # 短均線要比長均線小
+    
+    record = Record()
+    df_copy = KBar_df.copy()  # 防止原始資料污染
+    
+    run_strategy(df_copy, short_p, long_p, sl, record)
+    
+    profit = record.GetTotalProfit()
+    if profit > best_profit:
+        best_profit = profit
+        best_params = (short_p, long_p, sl)
+
+print("最佳參數：", best_params)
+print("最高獲利：", best_profit)
 #%%
 ####### (7) 呈現即時資料 #######
 
