@@ -97,11 +97,7 @@ if choice == choices[3] :                                                ##'英�
 if choice == choices[4] :                                                             ##'堤維西2020.1.2 至 2024.4.12':
     start_date, end_date = st.date_input("日期選擇範圍",[date(2020,1,2), date(2024,4,12)])  
 
-if isinstance(start_date, date) and isinstance(end_date, date):
-    start_datetime = datetime.combine(start_date, datetime.min.time())
-    end_datetime = datetime.combine(end_date, datetime.max.time())
-else:
-    st.error("請選擇有效的開始與結束日期。")
+
 	
 ## 轉變為datetime object.
 if isinstance(start_date, date) and not isinstance(start_date, datetime):
