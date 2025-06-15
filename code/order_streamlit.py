@@ -400,6 +400,54 @@ def run_strategy(KBar_df, short_period, long_period, MoveStopLoss, OrderRecord):
                     OrderRecord.Cover('Buy', product, next_time, next_open, Order_Quantity)
                     OrderBS = ''
                     continue
+
+
+def run_strategy_VWAP(df, offset_percent, stop_loss, record, qty):
+    df = calculate_vwap(df)
+    position = 0
+    stop_loss_price = 0
+
+    for n in range(1, len(df) - 1):
+        vwap_prev = df['VWAP'].iloc[n-1]
+        close_prev = df['close'].iloc[n-1]
+        vwap_curr = df['VWAP'].iloc[n]
+        close_curr = df['close'].iloc[n]
+        price_next_open = df['open'].iloc[n+1]
+        product_next = df['product'].iloc[n+1]
+        time_next = df['time'].iloc[n+1]
+
+        offset = offset_percent / 100
+
+        # 多單進場
+        if record.GetOpenInterest() == 0:
+            if close_prev < vwap_prev * (1 - offset) and close_curr > vwap_curr * (1 - offset):
+                record.Order('Buy', product_next, time_next, price_next_open, qty)
+                stop_loss_price = price_next_open - stop_loss
+                continue
+            elif close_prev > vwap_prev * (1 + offset) and close_curr < vwap_curr * (1 + offset):
+                record.Order('Sell', product_next, time_next, price_next_open, qty)
+                stop_loss_price = price_next_open + stop_loss
+                continue
+
+        elif record.GetOpenInterest() > 0:  # 多單
+            if df['product'].iloc[n+1] != df['product'].iloc[n]:
+                record.Cover('Sell', df['product'].iloc[n], df['time'].iloc[n], df['close'].iloc[n], record.GetOpenInterest())
+                continue
+            if df['close'].iloc[n] - stop_loss > stop_loss_price:
+                stop_loss_price = df['close'].iloc[n] - stop_loss
+            elif df['close'].iloc[n] < stop_loss_price:
+                record.Cover('Sell', product_next, time_next, price_next_open, record.GetOpenInterest())
+                continue
+
+        elif record.GetOpenInterest() < 0:  # 空單
+            if df['product'].iloc[n+1] != df['product'].iloc[n]:
+                record.Cover('Buy', df['product'].iloc[n], df['time'].iloc[n], df['close'].iloc[n], -record.GetOpenInterest())
+                continue
+            if df['close'].iloc[n] + stop_loss < stop_loss_price:
+                stop_loss_price = df['close'].iloc[n] + stop_loss
+            elif df['close'].iloc[n] > stop_loss_price:
+                record.Cover('Buy', product_next, time_next, price_next_open, -record.GetOpenInterest())
+                continue
     
         
         
