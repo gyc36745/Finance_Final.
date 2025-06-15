@@ -760,6 +760,67 @@ if choice_strategy == choices_strategies[1]:  # VWAP 策略
     ChartOrder_MA(KBar_df, OrderRecord.GetTradeRecord())
 
 
+if choice_strategy == choices_strategies[2]:  # BBANDS 策略
+    ##### 策略參數設定區
+    with st.expander("<策略參數設定>: 交易停損量、購買數量、BBANDS 週期"):
+        MoveStopLoss = st.slider('設定停損點數（股票每股價格 / 期貨指數點數）', 0, 100, 30, key='BBANDS_StopLoss')
+        Order_Quantity = st.slider('設定下單數量（股票張數 / 期貨口數）', 1, 100, 1, key='BBANDS_Qty')
+        BBANDS_period = st.slider('設定布林通道週期', 5, 50, 20, key='BBANDS_period')
+
+    ##### 計算布林通道
+    KBar_df = calculate_bbands(KBar_df, period=BBANDS_period)
+
+    ##### 建立部位管理物件
+    OrderRecord = Record()
+
+    ##### 回測主迴圈
+    for n in range(2, len(KBar_df)-1):
+        if np.isnan(KBar_df['BB_upper'][n]):
+            continue
+
+        # 無部位，進場邏輯
+        if OrderRecord.GetOpenInterest() == 0:
+            # 從下軌跌破後重新站回下軌 → 做多
+            if KBar_df['close'][n-2] < KBar_df['BB_lower'][n-2] and KBar_df['close'][n-1] > KBar_df['BB_lower'][n-1]:
+                OrderRecord.Order('Buy', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], Order_Quantity)
+                OrderPrice = KBar_df['open'][n+1]
+                StopLossPoint = OrderPrice - MoveStopLoss
+                continue
+            # 從上軌突破後重新跌回上軌 → 做空
+            elif KBar_df['close'][n-2] > KBar_df['BB_upper'][n-2] and KBar_df['close'][n-1] < KBar_df['BB_upper'][n-1]:
+                OrderRecord.Order('Sell', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], Order_Quantity)
+                OrderPrice = KBar_df['open'][n+1]
+                StopLossPoint = OrderPrice + MoveStopLoss
+                continue
+
+        # 多單出場
+        elif OrderRecord.GetOpenInterest() > 0:
+            # 商品更換時平倉
+            if KBar_df['product'][n+1] != KBar_df['product'][n]:
+                OrderRecord.Cover('Sell', KBar_df['product'][n], KBar_df['time'][n], KBar_df['close'][n], OrderRecord.GetOpenInterest())
+                continue
+            # 更新移動停損
+            if KBar_df['close'][n] - MoveStopLoss > StopLossPoint:
+                StopLossPoint = KBar_df['close'][n] - MoveStopLoss
+            elif KBar_df['close'][n] < StopLossPoint:
+                OrderRecord.Cover('Sell', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], OrderRecord.GetOpenInterest())
+                continue
+
+        # 空單出場
+        elif OrderRecord.GetOpenInterest() < 0:
+            if KBar_df['product'][n+1] != KBar_df['product'][n]:
+                OrderRecord.Cover('Buy', KBar_df['product'][n], KBar_df['time'][n], KBar_df['close'][n], -OrderRecord.GetOpenInterest())
+                continue
+            if KBar_df['close'][n] + MoveStopLoss < StopLossPoint:
+                StopLossPoint = KBar_df['close'][n] + MoveStopLoss
+            elif KBar_df['close'][n] > StopLossPoint:
+                OrderRecord.Cover('Buy', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], -OrderRecord.GetOpenInterest())
+                continue
+
+    ##### 繪圖
+    ChartOrder_MA(KBar_df, OrderRecord.GetTradeRecord())
+
+
 
 ##### 繪製K線圖加上MA以及下單點位
 # @st.cache_data(ttl=3600, show_spinner="正在加載資料...")  ## Add the caching decorator
