@@ -1196,7 +1196,7 @@ if choice_strategy == choices_strategies[1]:  # VWAP 策略
     stoploss_range = st.slider("停損點數範圍", 1, 100, (10, 50), key='VWAP_StopLoss_Range')
     #order_qty = st.slider("下單數量", 1, 100, 1, key='VWAP_Qty_opt')
     order_qty=1
-
+    record = Record()
     optimize_vwap = st.button("執行 VWAP 策略窮舉最佳化")
 
     if optimize_vwap:
