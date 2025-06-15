@@ -35,17 +35,10 @@ import plotly.graph_objects as go
 
 import streamlit as st
 
-page = st.sidebar.radio("導航選單", ["設定區塊", "視覺化圖形", "程式交易"])
+page = st.sidebar.radio("導航選單", ["首頁","程式交易"])
 
-if page == "設定區塊":
-    st.header("這是首頁內容")
-elif page == "視覺化圖形":
-    st.header("這是策略參數區塊")
-    # 放策略參數輸入組件
-elif page == "程式交易":
-    st.header("這是績效報表區塊")
-    # 放績效報表顯示組件
-#%%
+if page == "首頁":
+	#%%
 ####### (1) 開始設定 #######
 ###### 設定網頁標題介面 
 html_temp = """
@@ -528,13 +521,9 @@ with st.expander("K線圖, VWAP"):
     fig_vwap.add_trace(go.Scatter(x=KBar_df['time'], y=KBar_df['VWAP'], mode='lines', name='VWAP', line=dict(color='purple')), secondary_y=True)
     st.plotly_chart(fig_vwap, use_container_width=True)
 
-
-
-
-
-
-
-#%%
+	
+elif page == "程式交易":
+	#%%
 ####### (6) 程式交易 #######
 st.markdown("---")
 st.subheader("程式交易:")
@@ -1249,6 +1238,14 @@ if choice_strategy == choices_strategies[1]:  # VWAP 策略
         ).interactive()
 
         st.altair_chart(chart, use_container_width=True)
+
+
+
+
+
+
+
+
 
 #%%
 ####### (7) 呈現即時資料 #######
