@@ -1095,6 +1095,14 @@ OrderRecord.GeneratorProfit_rateChart(StrategyName='MA')
 # st.pyplot(plt)
 
 #%%最佳化
+with st.container():
+    st.markdown(
+        """
+        <div style="border: 2px solid #4CAF50; padding: 15px; border-radius: 10px; background-color: #f9f9f9;">
+        """,
+        unsafe_allow_html=True
+    )
+
 
 
 
