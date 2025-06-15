@@ -417,7 +417,7 @@ with st.expander("K線圖, 移動平均線"):
     st.plotly_chart(fig1, use_container_width=True)
 
 #K線圖, 指數移動平均線EMA
-with st.expander("K線圖, 指數移動平均線):
+with st.expander("K線圖, 指數移動平均線"):
     fig_ema = make_subplots(specs=[[{"secondary_y": True}]])
     fig_ema.add_trace(go.Candlestick(x=KBar_df['time'],
                                      open=KBar_df['open'], high=KBar_df['high'],
