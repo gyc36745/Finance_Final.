@@ -31,7 +31,8 @@ import matplotlib.pyplot as plt
 import matplotlib
 from datetime import datetime, date, time
 import plotly.graph_objects as go
-
+import itertools
+from itertools import product
 
 
 #%%
@@ -1099,8 +1100,7 @@ OrderRecord.GeneratorProfit_rateChart(StrategyName='MA')
 
 st.markdown("---")
 st.subheader("策略參數最佳化")
-import itertools
-from itertools import product
+
 
 if choice_strategy == choices_strategies[0]:	
 	#short_range = range(3, 10)
