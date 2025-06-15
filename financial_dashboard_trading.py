@@ -643,7 +643,10 @@ if choice_strategy == choices_strategies[0]:
         
         #### 尋找最後 NAN值的位置
         #last_nan_index_MA_trading = KBar_df['MA_long'][::-1].index[KBar_df['MA_long'][::-1].apply(pd.isna)][0]
-	last_nan_index_MA_trading = KBar_df['MA_long'].isna()[::-1].idxmax()
+	if KBar_df['MA_long'].isna().any():
+    		last_nan_index_MA_trading = KBar_df['MA_long'].isna()[::-1].idxmax()
+	else:
+    		last_nan_index_MA_trading = 0  # 或 0，看你要從哪裡開始畫
 	    
 
 
