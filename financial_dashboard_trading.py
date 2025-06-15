@@ -1100,7 +1100,7 @@ OrderRecord.GeneratorProfit_rateChart(StrategyName='MA')
 st.markdown("---")
 st.subheader("策略參數最佳化")
 import itertools
-from itertools import product
+#from itertools import product
 
 if choice_strategy == choices_strategies[0]:	
 	#short_range = range(3, 10)
