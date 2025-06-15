@@ -368,6 +368,13 @@ def calculate_vwap(df):
     return df
 KBar_df = calculate_vwap(KBar_df)
 
+#------------------------------------EMA
+def calculate_ema(df, period=12):
+    df[f'EMA_{period}'] = df['close'].ewm(span=period, adjust=False).mean()
+    return df
+KBar_df = calculate_ema(KBar_df)
+
+
 # ####### (5) 將 Dataframe 欄位名稱轉換(第一個字母大寫)  ####### 
 # KBar_df_original = KBar_df
 # KBar_df.columns = [ i[0].upper()+i[1:] for i in KBar_df.columns ]
@@ -408,6 +415,16 @@ with st.expander("K線圖, 移動平均線"):
     
     fig1.layout.yaxis2.showgrid=True
     st.plotly_chart(fig1, use_container_width=True)
+
+#K線圖, 指數移動平均線EMA
+with st.expander("K線圖, 指數移動平均線):
+    fig_ema = make_subplots(specs=[[{"secondary_y": True}]])
+    fig_ema.add_trace(go.Candlestick(x=KBar_df['time'],
+                                     open=KBar_df['open'], high=KBar_df['high'],
+                                     low=KBar_df['low'], close=KBar_df['close'], name='K線'),
+                      secondary_y=True)
+    fig_ema.add_trace(go.Scatter(x=KBar_df['time'], y=KBar_df['EMA_12'], mode='lines', name='EMA_12', line=dict(color='green')), secondary_y=True)
+    st.plotly_chart(fig_ema, use_container_width=True)
 
 
 ###### K線圖, RSI
@@ -487,7 +504,7 @@ with st.expander("MACD(異同移動平均線)"):
     st.plotly_chart(fig4, use_container_width=True)
 
 #VWAP
-with st.expander("K線圖 + VWAP"):
+with st.expander("K線圖,VWAP"):
     fig_vwap = make_subplots(specs=[[{"secondary_y": True}]])
     fig_vwap.add_trace(go.Candlestick(x=KBar_df['time'],
                                       open=KBar_df['open'], high=KBar_df['high'],
@@ -495,6 +512,9 @@ with st.expander("K線圖 + VWAP"):
                        secondary_y=True)
     fig_vwap.add_trace(go.Scatter(x=KBar_df['time'], y=KBar_df['VWAP'], mode='lines', name='VWAP', line=dict(color='purple')), secondary_y=True)
     st.plotly_chart(fig_vwap, use_container_width=True)
+
+#EMA
+
 
 
 
