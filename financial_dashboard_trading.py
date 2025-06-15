@@ -57,7 +57,7 @@ def load_data(path):
 
 ###### 選擇金融商品
 d='./data/'
-st.title("選擇金融商品: ")
+st.subheader("選擇金融商品: ")
 # choices = ['台積電: 2022.1.1 至 2024.4.9', '大台指2024.12到期: 2024.1 至 2024.4.9']
 choices = ['台積電: 2022.1.1 至 2024.4.9', '大台指期貨2024.12到期: 2023.12 至 2024.4.11', '小台指期貨2024.12到期: 2023.12 至 2024.4.11', '英業達2020.1.2 至 2024.4.12', '堤維西2020.1.2 至 2024.4.12']
 choice = st.selectbox('選擇金融商品', choices, index=0)
@@ -1099,7 +1099,7 @@ OrderRecord.GeneratorProfit_rateChart(StrategyName='MA')
 
 
 
-st.markdown("---")
+#st.markdown("---")
 st.subheader("策略參數最佳化")
 import itertools
 #from itertools import product
