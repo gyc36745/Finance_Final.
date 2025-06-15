@@ -1103,9 +1103,9 @@ import itertools
 #from itertools import product
 
 if choice_strategy == choices_strategies[0]:	
-	#short_range = range(3, 10)
-	#long_range = range(10, 30, 5)
-	#stoploss_range = [5, 10, 15]
+	short_range = range(3, 10)
+	long_range = range(10, 30, 5)
+	stoploss_range = [5, 10, 15]
 	
 	best_profit = -float('inf')
 	best_params = None
