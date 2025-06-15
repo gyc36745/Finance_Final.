@@ -366,6 +366,7 @@ def calculate_vwap(df):
     vwap = (typical_price * df['volume']).cumsum() / df['volume'].cumsum()
     df['VWAP'] = vwap
     return df
+KBar_df = calculate_vwap(KBar_df)
 
 # ####### (5) 將 Dataframe 欄位名稱轉換(第一個字母大寫)  ####### 
 # KBar_df_original = KBar_df
