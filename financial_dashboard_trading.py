@@ -452,7 +452,7 @@ with st.expander("長短 RSI"):
     
 
 ###### K線圖, Bollinger Band    
-with st.expander("K線圖,布林通道"):
+with st.expander("K線圖, 布林通道"):
     fig3 = make_subplots(specs=[[{"secondary_y": True}]])
     fig3.update_layout(yaxis=dict(fixedrange=False,  # 允許y軸縮放
                                   autorange=True    # 自動調整範圍
@@ -504,7 +504,7 @@ with st.expander("MACD(異同移動平均線)"):
     st.plotly_chart(fig4, use_container_width=True)
 
 #VWAP
-with st.expander("K線圖,VWAP"):
+with st.expander("K線圖, VWAP"):
     fig_vwap = make_subplots(specs=[[{"secondary_y": True}]])
     fig_vwap.add_trace(go.Candlestick(x=KBar_df['time'],
                                       open=KBar_df['open'], high=KBar_df['high'],
