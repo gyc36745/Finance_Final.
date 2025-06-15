@@ -8,6 +8,12 @@ import numpy as np
 import time
 import streamlit as st
 
+
+def calculate_vwap(df):
+    typical_price = (df['high'] + df['low'] + df['close']) / 3
+    vwap = (typical_price * df['volume']).cumsum() / df['volume'].cumsum()
+    df['VWAP'] = vwap
+    return df
 # 下單部位管理物件
 class Record():
     def __init__(self ):   ## 建構子
