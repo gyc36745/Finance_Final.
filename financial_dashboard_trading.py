@@ -368,11 +368,7 @@ def calculate_vwap(df):
     return df
 KBar_df = calculate_vwap(KBar_df)
 
-def calculate_vwap(df):
-    q = df['volume']  # 成交量
-    p = (df['high'] + df['low'] + df['close']) / 3  # 典型價格
-    vwap = (p * q).cumsum() / q.cumsum()
-    return vwap
+
 
 #------------------------------------EMA
 def calculate_ema(df, period=12):
