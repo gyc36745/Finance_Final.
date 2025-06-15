@@ -1063,9 +1063,11 @@ print("最高獲利：", best_profit)
 
 # -- 參數輸入 --
 st.sidebar.header("最佳化參數尋找範圍")
-short_range = st.sidebar.slider("短均線範圍", 3, 20, (5, 10))
-long_range = st.sidebar.slider("長均線範圍", 10, 60, (20, 30))
-sl_values = st.sidebar.multiselect("移動停損點數", [5, 10, 15, 20], default=[10])
+short_range = st.sidebar.slider("短均線範圍", 1, 100, (5, 10))
+long_range = st.sidebar.slider("長均線範圍", 1, 100, (20, 30))
+#sl_values = st.sidebar.multiselect("移動停損點數", [5, 10, 15, 20], default=[10])
+sl_values = st.sidebar.slider("移動停損點數", min_value=1, max_value=100, value=10)
+
 
 optimize = st.sidebar.button("執行窮舉最佳化")
 
