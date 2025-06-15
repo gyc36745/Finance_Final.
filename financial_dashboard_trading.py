@@ -1062,7 +1062,7 @@ print("最高獲利：", best_profit)
 
 
 # -- 參數輸入 --
-st.sidebar.header("參數設定")
+st.sidebar.header("最佳化參數尋找範圍")
 short_range = st.sidebar.slider("短均線範圍", 3, 20, (5, 10))
 long_range = st.sidebar.slider("長均線範圍", 10, 60, (20, 30))
 sl_values = st.sidebar.multiselect("移動停損點數", [5, 10, 15, 20], default=[10])
@@ -1070,8 +1070,8 @@ sl_values = st.sidebar.multiselect("移動停損點數", [5, 10, 15, 20], defaul
 optimize = st.sidebar.button("執行窮舉最佳化")
 
 # -- 顯示原始資料 --
-st.subheader("原始 K 線資料")
-st.dataframe(KBar_df.head())
+#st.subheader("原始 K 線資料")
+#st.dataframe(KBar_df.head())
 # -- 執行最佳化邏輯 --
 if optimize:
     best_profit = -np.inf
