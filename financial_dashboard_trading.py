@@ -1141,7 +1141,7 @@ if choice_strategy == choices_strategies[0]:
 	##sl_values = st.sidebar.multiselect("移動停損點數", [5, 10, 15, 20], default=[10])
 	#sl_value = st.sidebar.slider("移動停損點數", min_value=1, max_value=100, value=30)
 	#sl_values = [sl_value]
-	
+	stoploss_range = st.slider("移動停損點數範圍", min_value=1, max_value=100, value=(10, 30))
 	
 	#optimize = st.sidebar.button("執行窮舉最佳化")
 	
@@ -1149,7 +1149,7 @@ if choice_strategy == choices_strategies[0]:
 	#st.subheader("原始 K 線資料")
 	#st.dataframe(KBar_df.head())
 	# -- 執行最佳化邏輯 --
-	'''
+
 	if optimize:
 	    best_profit = -np.inf
 	    best_params = None
@@ -1187,11 +1187,10 @@ if choice_strategy == choices_strategies[0]:
 	    ).interactive()
 	
 	    st.altair_chart(chart, use_container_width=True)
-     '''
-		# 讓使用者用範圍滑桿選停損範圍（用元組）
-	stoploss_range = st.slider("移動停損點數範圍", min_value=1, max_value=100, value=(10, 30))
+
+
 	
-	
+'''
 	if optimize:
 	    best_profit = -np.inf
 	    best_params = None
@@ -1227,7 +1226,7 @@ if choice_strategy == choices_strategies[0]:
 	    ).interactive()
 	
 	    st.altair_chart(chart, use_container_width=True)
-
+'''
 
 
 if choice_strategy == choices_strategies[1]:  # VWAP 策略
