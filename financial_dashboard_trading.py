@@ -30,6 +30,7 @@ from order_streamlit import Record, run_strategy
 import matplotlib.pyplot as plt
 import matplotlib
 from datetime import datetime, date, time
+import plotly.graph_objects as go
 
 
 
