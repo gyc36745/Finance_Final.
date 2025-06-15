@@ -340,39 +340,39 @@ class Record():
         ### 在Streamlit中显示
         st.pyplot(plt)
 
-    def run_strategy(KBar_df, short_period, long_period, MoveStopLoss, OrderRecord):
-        KBar_df['MA_short'] = KBar_df['close'].rolling(window=short_period).mean()
-        KBar_df['MA_long'] = KBar_df['close'].rolling(window=long_period).mean()
-        Order_Quantity = 1
-        StopLossPoint = 0
-        OrderPrice = 0
+def run_strategy(KBar_df, short_period, long_period, MoveStopLoss, OrderRecord):
+    KBar_df['MA_short'] = KBar_df['close'].rolling(window=short_period).mean()
+    KBar_df['MA_long'] = KBar_df['close'].rolling(window=long_period).mean()
+    Order_Quantity = 1
+    StopLossPoint = 0
+    OrderPrice = 0
+
+    for n in range(1, len(KBar_df['time']) - 1):
+        if not np.isnan(KBar_df['MA_long'][n - 1]):
+            if OrderRecord.GetOpenInterest() == 0:
+                if KBar_df['MA_short'][n - 1] <= KBar_df['MA_long'][n - 1] and KBar_df['MA_short'][n] > KBar_df['MA_long'][n]:
+                    OrderRecord.Order('Buy', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], Order_Quantity)
+                    OrderPrice = KBar_df['open'][n+1]
+                    StopLossPoint = OrderPrice - MoveStopLoss
+                    continue
+                if KBar_df['MA_short'][n - 1] >= KBar_df['MA_long'][n - 1] and KBar_df['MA_short'][n] < KBar_df['MA_long'][n]:
+                    OrderRecord.Order('Sell', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], Order_Quantity)
+                    OrderPrice = KBar_df['open'][n+1]
+                    StopLossPoint = OrderPrice + MoveStopLoss
+                    continue
+            elif OrderRecord.GetOpenInterest() > 0:
+                if KBar_df['close'][n] - MoveStopLoss > StopLossPoint:
+                    StopLossPoint = KBar_df['close'][n] - MoveStopLoss
+                elif KBar_df['close'][n] < StopLossPoint:
+                    OrderRecord.Cover('Sell', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], OrderRecord.GetOpenInterest())
+                    continue
+            elif OrderRecord.GetOpenInterest() < 0:
+                if KBar_df['close'][n] + MoveStopLoss < StopLossPoint:
+                    StopLossPoint = KBar_df['close'][n] + MoveStopLoss
+                elif KBar_df['close'][n] > StopLossPoint:
+                    OrderRecord.Cover('Buy', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], -OrderRecord.GetOpenInterest())
+                    continue
     
-        for n in range(1, len(KBar_df['time']) - 1):
-            if not np.isnan(KBar_df['MA_long'][n - 1]):
-                if OrderRecord.GetOpenInterest() == 0:
-                    if KBar_df['MA_short'][n - 1] <= KBar_df['MA_long'][n - 1] and KBar_df['MA_short'][n] > KBar_df['MA_long'][n]:
-                        OrderRecord.Order('Buy', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], Order_Quantity)
-                        OrderPrice = KBar_df['open'][n+1]
-                        StopLossPoint = OrderPrice - MoveStopLoss
-                        continue
-                    if KBar_df['MA_short'][n - 1] >= KBar_df['MA_long'][n - 1] and KBar_df['MA_short'][n] < KBar_df['MA_long'][n]:
-                        OrderRecord.Order('Sell', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], Order_Quantity)
-                        OrderPrice = KBar_df['open'][n+1]
-                        StopLossPoint = OrderPrice + MoveStopLoss
-                        continue
-                elif OrderRecord.GetOpenInterest() > 0:
-                    if KBar_df['close'][n] - MoveStopLoss > StopLossPoint:
-                        StopLossPoint = KBar_df['close'][n] - MoveStopLoss
-                    elif KBar_df['close'][n] < StopLossPoint:
-                        OrderRecord.Cover('Sell', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], OrderRecord.GetOpenInterest())
-                        continue
-                elif OrderRecord.GetOpenInterest() < 0:
-                    if KBar_df['close'][n] + MoveStopLoss < StopLossPoint:
-                        StopLossPoint = KBar_df['close'][n] + MoveStopLoss
-                    elif KBar_df['close'][n] > StopLossPoint:
-                        OrderRecord.Cover('Buy', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], -OrderRecord.GetOpenInterest())
-                        continue
-        
         
         
         
