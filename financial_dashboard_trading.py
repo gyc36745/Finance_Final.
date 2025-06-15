@@ -1191,14 +1191,14 @@ with st.expander("策略參數最佳化", expanded=True):
 	
 	
 	if choice_strategy == choices_strategies[1]:  # VWAP 策略
-	    st.markdown("<h5>選取 VWAP 策略參數範圍</h5>", unsafe_allow_html=True)
+	    st.markdown("<h5>選取要試的參數範圍</h5>", unsafe_allow_html=True)
 	
 	    # 1. 讓使用者自訂偏移範圍與停損值
 	    offset_range = st.slider("VWAP 偏移百分比範圍（%）", 0, 10, (1, 3), key='VWAP_Offset_Range')
 	    stoploss_range = st.slider("停損點數範圍", 1, 100, (10, 50), key='VWAP_StopLoss_Range')
 	    #order_qty = st.slider("下單數量", 1, 100, 1, key='VWAP_Qty_opt')
 	    order_qty=1
-	    optimize_vwap = st.button("執行 VWAP 策略窮舉最佳化")
+	    optimize_vwap = st.button("執行窮舉最佳化")
 	
 	    if optimize_vwap:
 	        best_profit = -np.inf
@@ -1222,7 +1222,7 @@ with st.expander("策略參數最佳化", expanded=True):
 	
 	        # 顯示表格
 	        df_result = pd.DataFrame(results, columns=["VWAP偏移(%)", "停損", "總獲利"])
-	        st.subheader("VWAP 策略績效")
+	        st.subheader("所有參數組合績效")
 	        st.dataframe(df_result.sort_values(by="總獲利", ascending=False).reset_index(drop=True))
 	
 	        # Altair 視覺化
