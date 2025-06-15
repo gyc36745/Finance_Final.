@@ -1067,6 +1067,7 @@ short_range = st.sidebar.slider("短均線範圍", 1, 100, (5, 10))
 long_range = st.sidebar.slider("長均線範圍", 1, 100, (20, 30))
 #sl_values = st.sidebar.multiselect("移動停損點數", [5, 10, 15, 20], default=[10])
 sl_values = st.sidebar.slider("移動停損點數", min_value=1, max_value=100, value=10)
+sl_values = [sl_value]
 
 
 optimize = st.sidebar.button("執行窮舉最佳化")
