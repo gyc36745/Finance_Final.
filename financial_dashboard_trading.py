@@ -1136,6 +1136,7 @@ if choice_strategy == choices_strategies[0]:
 	long_range = st.slider("長均線範圍", 1, 100, (20, 30))
 	sl_value = st.slider("移動停損點數", min_value=1, max_value=100, value=30)
 	sl_values = [sl_value]
+	optimize = st.button("執行窮舉最佳化")
 	#st.sidebar.header("最佳化參數尋找範圍")
 	#short_range = st.sidebar.slider("短均線範圍", 1, 100, (5, 10))
 	#long_range = st.sidebar.slider("長均線範圍", 1, 100, (20, 30))
@@ -1144,7 +1145,7 @@ if choice_strategy == choices_strategies[0]:
 	#sl_values = [sl_value]
 	
 	
-	optimize = st.sidebar.button("執行窮舉最佳化")
+	#optimize = st.sidebar.button("執行窮舉最佳化")
 	
 	# -- 顯示原始資料 --
 	#st.subheader("原始 K 線資料")
