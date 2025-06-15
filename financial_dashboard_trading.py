@@ -1098,7 +1098,7 @@ OrderRecord.GeneratorProfit_rateChart(StrategyName='MA')
 
 
 
-st.subheader("策略參數最佳化---------------------------------------------------------")
+st.subheader("策略參數最佳化--------------------------------------------------------")
 import itertools
 from itertools import product
 
