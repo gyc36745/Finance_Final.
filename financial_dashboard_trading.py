@@ -25,7 +25,7 @@ import indicator_f_Lo2_short, indicator_forKBar_short
 import pandas as pd
 import streamlit as st 
 import streamlit.components.v1 as stc 
-from order_streamlit import Record, run_strategy
+from order_streamlit import Record, run_strategy, run_strategy_VWAP
 
 import matplotlib.pyplot as plt
 import matplotlib
@@ -714,8 +714,10 @@ if choice_strategy == choices_strategies[0]:
 if choice_strategy == choices_strategies[1]:  # VWAP 策略
     ##### 策略參數設定區
     with st.expander("<策略參數設定>: 交易停損量、購買數量"):
+	offset_range = st.sidebar.slider("VWAP 偏移百分比（%）", 0, 10, (1, 3), key='VWAP_Offset')
         MoveStopLoss = st.slider('設定停損點數（股票每股價格 / 期貨指數點數）', 0, 100, 30, key='VWAP_StopLoss')
         Order_Quantity = st.slider('設定下單數量（股票張數 / 期貨口數）', 1, 100, 1, key='VWAP_Qty')
+	
 
     ##### 計算 VWAP
     KBar_df = calculate_vwap(KBar_df)
@@ -1179,84 +1181,120 @@ OrderRecord.GeneratorProfit_rateChart(StrategyName='MA')
 
 
 st.subheader("策略參數最佳化")
-
 import itertools
 from itertools import product
 
-short_range = range(3, 10)
-long_range = range(10, 30, 5)
-stoploss_range = [5, 10, 15]
+if choice_strategy == choices_strategies[0]:
 
-best_profit = -float('inf')
-best_params = None
+	
+	short_range = range(3, 10)
+	long_range = range(10, 30, 5)
+	stoploss_range = [5, 10, 15]
+	
+	best_profit = -float('inf')
+	best_params = None
+	
+	for short_p, long_p, sl in itertools.product(short_range, long_range, stoploss_range):
+	    if short_p >= long_p:
+	        continue  # 短均線要比長均線小
+	    
+	    record = Record()
+	    df_copy = KBar_df.copy()  # 防止原始資料污染
+	    
+	    run_strategy(df_copy, short_p, long_p, sl, record)
+	    
+	    profit = record.GetTotalProfit()
+	    if profit > best_profit:
+	        best_profit = profit
+	        best_params = (short_p, long_p, sl)
+	
+	print("最佳參數：", best_params)
+	print("最高獲利：", best_profit)
+	
+	
+	# -- 參數輸入 --
+	st.sidebar.header("最佳化參數尋找範圍")
+	short_range = st.sidebar.slider("短均線範圍", 1, 100, (5, 10))
+	long_range = st.sidebar.slider("長均線範圍", 1, 100, (20, 30))
+	#sl_values = st.sidebar.multiselect("移動停損點數", [5, 10, 15, 20], default=[10])
+	sl_value = st.sidebar.slider("移動停損點數", min_value=1, max_value=100, value=30)
+	sl_values = [sl_value]
+	
+	
+	optimize = st.sidebar.button("執行窮舉最佳化")
+	
+	# -- 顯示原始資料 --
+	#st.subheader("原始 K 線資料")
+	#st.dataframe(KBar_df.head())
+	# -- 執行最佳化邏輯 --
+	if optimize:
+	    best_profit = -np.inf
+	    best_params = None
+	    results = []
+	
+	    for short, long in product(range(short_range[0], short_range[1]+1), range(long_range[0], long_range[1]+1)):
+	        if short >= long:
+	            continue
+	        for sl in sl_values:
+	            record = Record()
+	            df_copy = KBar_df.copy()
+	            run_strategy(df_copy, short, long, sl, record)
+	            profit = record.GetTotalProfit()
+	            results.append((short, long, sl, profit))
+	
+	            if profit > best_profit:
+	                best_profit = profit
+	                best_params = (short, long, sl)
+	
+	    # -- 顯示最佳參數 --
+	    st.success(f"最佳參數：短MA={best_params[0]}, 長MA={best_params[1]}, 停損={best_params[2]}，總獲利={best_profit:.2f}")
+	
+	    # -- 顯示所有結果表格 --
+	    df_result = pd.DataFrame(results, columns=["short_MA", "long_MA", "StopLoss", "TotalProfit"])
+	    st.subheader("所有參數組合績效")
+	    st.dataframe(df_result.sort_values(by="TotalProfit", ascending=False).reset_index(drop=True))
+	
+	    # -- 繪圖（可選） --
+	    import altair as alt
+	    chart = alt.Chart(df_result).mark_circle(size=60).encode(
+	        x='short_MA:Q',
+	        y='long_MA:Q',
+	        color='TotalProfit:Q',
+	        tooltip=['short_MA', 'long_MA', 'StopLoss', 'TotalProfit']
+	    ).interactive()
+	
+	    st.altair_chart(chart, use_container_width=True)
 
-for short_p, long_p, sl in itertools.product(short_range, long_range, stoploss_range):
-    if short_p >= long_p:
-        continue  # 短均線要比長均線小
-    
-    record = Record()
-    df_copy = KBar_df.copy()  # 防止原始資料污染
-    
-    run_strategy(df_copy, short_p, long_p, sl, record)
-    
-    profit = record.GetTotalProfit()
-    if profit > best_profit:
-        best_profit = profit
-        best_params = (short_p, long_p, sl)
 
-print("最佳參數：", best_params)
-print("最高獲利：", best_profit)
-
-
-# -- 參數輸入 --
-st.sidebar.header("最佳化參數尋找範圍")
-short_range = st.sidebar.slider("短均線範圍", 1, 100, (5, 10))
-long_range = st.sidebar.slider("長均線範圍", 1, 100, (20, 30))
-#sl_values = st.sidebar.multiselect("移動停損點數", [5, 10, 15, 20], default=[10])
-sl_value = st.sidebar.slider("移動停損點數", min_value=1, max_value=100, value=30)
-sl_values = [sl_value]
-
-
-optimize = st.sidebar.button("執行窮舉最佳化")
-
-# -- 顯示原始資料 --
-#st.subheader("原始 K 線資料")
-#st.dataframe(KBar_df.head())
-# -- 執行最佳化邏輯 --
-if optimize:
+if optimize and choice_strategy == choices_strategies[1]:  # VWAP 策略
     best_profit = -np.inf
     best_params = None
     results = []
 
-    for short, long in product(range(short_range[0], short_range[1]+1), range(long_range[0], long_range[1]+1)):
-        if short >= long:
-            continue
-        for sl in sl_values:
+    for offset in range(offset_range[0], offset_range[1] + 1):
+        for sl in [MoveStopLoss]:
             record = Record()
             df_copy = KBar_df.copy()
-            run_strategy(df_copy, short, long, sl, record)
+            run_strategy_VWAP(df_copy, offset, sl, record, Order_Quantity)
             profit = record.GetTotalProfit()
-            results.append((short, long, sl, profit))
+            results.append((offset, sl, profit))
 
             if profit > best_profit:
                 best_profit = profit
-                best_params = (short, long, sl)
+                best_params = (offset, sl)
 
-    # -- 顯示最佳參數 --
-    st.success(f"最佳參數：短MA={best_params[0]}, 長MA={best_params[1]}, 停損={best_params[2]}，總獲利={best_profit:.2f}")
+    st.success(f"最佳 VWAP 參數：偏移={best_params[0]}%、停損={best_params[1]}，總獲利={best_profit:.2f}")
 
-    # -- 顯示所有結果表格 --
-    df_result = pd.DataFrame(results, columns=["short_MA", "long_MA", "StopLoss", "TotalProfit"])
-    st.subheader("所有參數組合績效")
-    st.dataframe(df_result.sort_values(by="TotalProfit", ascending=False).reset_index(drop=True))
+    df_result = pd.DataFrame(results, columns=["VWAP偏移(%)", "停損", "總獲利"])
+    st.subheader("VWAP 策略績效")
+    st.dataframe(df_result.sort_values(by="總獲利", ascending=False).reset_index(drop=True))
 
-    # -- 繪圖（可選） --
     import altair as alt
     chart = alt.Chart(df_result).mark_circle(size=60).encode(
-        x='short_MA:Q',
-        y='long_MA:Q',
-        color='TotalProfit:Q',
-        tooltip=['short_MA', 'long_MA', 'StopLoss', 'TotalProfit']
+        x='VWAP偏移(%)',
+        y='停損',
+        color='總獲利',
+        tooltip=['VWAP偏移(%)', '停損', '總獲利']
     ).interactive()
 
     st.altair_chart(chart, use_container_width=True)
