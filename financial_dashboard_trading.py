@@ -33,7 +33,18 @@ from datetime import datetime, date, time
 import plotly.graph_objects as go
 
 
+import streamlit as st
 
+page = st.sidebar.radio("導航選單", ["設定區塊", "視覺化圖形", "程式交易"])
+
+if page == "設定區塊":
+    st.header("這是首頁內容")
+elif page == "視覺化圖形":
+    st.header("這是策略參數區塊")
+    # 放策略參數輸入組件
+elif page == "程式交易":
+    st.header("這是績效報表區塊")
+    # 放績效報表顯示組件
 #%%
 ####### (1) 開始設定 #######
 ###### 設定網頁標題介面 
