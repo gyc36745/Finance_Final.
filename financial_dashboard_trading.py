@@ -91,7 +91,7 @@ if choice == choices[4] :                                                       
 
 
 ###### 選擇資料區間
-st.subheader("選擇資料時間區間")
+st.subheader("選擇資料時間區間: ")
 if choice == choices[0]:  # 台積電
     default_start = date(2022, 1, 1)
     default_end = date(2024, 4, 9)
