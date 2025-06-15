@@ -1194,7 +1194,7 @@ if choice_strategy == choices_strategies[1]:  # VWAP 策略
     # 1. 讓使用者自訂偏移範圍與停損值
     offset_range = st.slider("VWAP 偏移百分比範圍（%）", 0, 10, (1, 3), key='VWAP_Offset_Range')
     stoploss_range = st.slider("停損點數範圍", 1, 100, (10, 50), key='VWAP_StopLoss_Range')
-    order_qty = st.slider("下單數量", 1, 100, 1, key='VWAP_Qty')
+    order_qty = st.slider("下單數量", 1, 100, 1, key='VWAP_Qty_opt')
 
     optimize_vwap = st.button("執行 VWAP 策略窮舉最佳化")
 
