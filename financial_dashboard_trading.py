@@ -637,7 +637,7 @@ choice_strategy = st.selectbox('選擇交易策略', choices_strategies, index=0
 #if choice_strategy == '<進場>: 移動平均線黃金交叉作多,死亡交叉作空. <出場>: 結算平倉(期貨), 移動停損.':
 if choice_strategy == choices_strategies[0]:
     ##### 選擇參數
-    with st.expander("<策略參數設定>: 交易停損量、長移動平均線(MA)的K棒週期數目、短移動平均線(MA)的K棒週期數目、購買數量"):
+    with st.expander("<策略參數設定>: "):
         MoveStopLoss = st.slider('選擇程式交易停損量(股票:每股價格; 期貨(大小台指):台股指數點數. 例如: 股票進場做多時, 取30代表停損價格為目前每股價格減30元; 大小台指進場做多時, 取30代表停損指數為目前台股指數減30點)', 0, 100, 30, key='MoveStopLoss')
         LongMAPeriod_trading=st.slider('設定計算長移動平均線(MA)的 K棒週期數目(整數, 例如 10)', 0, 100, 10, key='trading_MA_long')
         ShortMAPeriod_trading=st.slider('設定計算短移動平均線(MA)的 K棒週期數目(整數, 例如 2)', 0, 100, 2, key='trading_MA_short')
@@ -713,7 +713,7 @@ if choice_strategy == choices_strategies[0]:
 
 #VWAP
 if choice_strategy == choices_strategies[1]:  # VWAP 策略
-    with st.expander("<策略參數設定>: VWAP 偏移百分比、停損點數、下單數量"):
+    with st.expander("<策略參數設定>:"):
         offset_range = st.slider("VWAP 偏移百分比（%）", 0, 10, (1, 3), key='VWAP_Offset')
         MoveStopLoss = st.slider('停損點數', 0, 100, 30, key='VWAP_StopLoss')
         Order_Quantity = st.slider('下單數量', 1, 100, 1, key='VWAP_Qty')
