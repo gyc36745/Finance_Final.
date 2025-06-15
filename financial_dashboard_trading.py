@@ -531,6 +531,11 @@ st.subheader("程式交易:")
 ###### 函數定義: 繪製K線圖加上MA以及下單點位
 # @st.cache_data(ttl=3600, show_spinner="正在加載資料...")  ## Add the caching decorator
 def ChartOrder_MA(Kbar_df,TR):
+# 檢查 MA_long 欄位是否有 NaN
+    if KBar_df['MA_long'].isna().any():
+        last_nan_index_MA_trading = KBar_df['MA_long'].isna()[::-1].idxmax()
+    else:
+        last_nan_index_MA_trading = -1  # 無 NaN 時，從頭畫起
     # # 將K線轉為DataFrame
     # Kbar_df=KbarToDf(KBar)
     # 買(多)方下單點位紀錄
@@ -642,11 +647,8 @@ if choice_strategy == choices_strategies[0]:
         KBar_df['MA_short'] = Calculate_MA(KBar_df, period=ShortMAPeriod_trading)
         
         #### 尋找最後 NAN值的位置
-        #last_nan_index_MA_trading = KBar_df['MA_long'][::-1].index[KBar_df['MA_long'][::-1].apply(pd.isna)][0]
-        if KBar_df['MA_long'].isna().any():
-    	    last_nan_index_MA_trading = KBar_df['MA_long'].isna()[::-1].idxmax()
-        else:
-    	    last_nan_index_MA_trading = 0  # 或 0，看你要從哪裡開始畫
+        last_nan_index_MA_trading = KBar_df['MA_long'][::-1].index[KBar_df['MA_long'][::-1].apply(pd.isna)][0]
+
 	    
 
 
