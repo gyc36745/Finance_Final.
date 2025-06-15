@@ -712,15 +712,14 @@ if choice_strategy == choices_strategies[0]:
 
 #VWAP
 if choice_strategy == choices_strategies[1]:  # VWAP 策略
-    offset_range = st.sidebar.slider("VWAP 偏移百分比（%）", 0, 10, (1, 3), key='VWAP_Offset')
-    MoveStopLoss = st.slider('停損點數', 0, 100, 30, key='VWAP_StopLoss')
-    Order_Quantity = st.slider('下單數量', 1, 100, 1, key='VWAP_Qty')
+    with st.expander("<策略參數設定>: VWAP 偏移百分比、停損點數、下單數量"):
+        offset_range = st.slider("VWAP 偏移百分比（%）", 0, 10, (1, 3), key='VWAP_Offset')
+        MoveStopLoss = st.slider('停損點數', 0, 100, 30, key='VWAP_StopLoss')
+        Order_Quantity = st.slider('下單數量', 1, 100, 1, key='VWAP_Qty')
 
     OrderRecord = Record()
     run_strategy_VWAP(KBar_df, offset_range[0], MoveStopLoss, Order_Quantity, OrderRecord)
-
     ChartOrder_MA(KBar_df, OrderRecord.GetTradeRecord())
-
 
 
 
