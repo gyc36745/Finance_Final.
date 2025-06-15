@@ -1133,9 +1133,9 @@ if choice_strategy == choices_strategies[0]:
 	# -- 參數輸入 --
 	st.markdown("### 最佳化參數尋找範圍")
 	short_range = st.slider("短均線範圍", 1, 100, (5, 10))
-        long_range = st.slider("長均線範圍", 1, 100, (20, 30))
-        sl_value = st.slider("移動停損點數", min_value=1, max_value=100, value=30)
-        sl_values = [sl_value]
+	long_range = st.slider("長均線範圍", 1, 100, (20, 30))
+	sl_value = st.slider("移動停損點數", min_value=1, max_value=100, value=30)
+	sl_values = [sl_value]
 	#st.sidebar.header("最佳化參數尋找範圍")
 	#short_range = st.sidebar.slider("短均線範圍", 1, 100, (5, 10))
 	#long_range = st.sidebar.slider("長均線範圍", 1, 100, (20, 30))
