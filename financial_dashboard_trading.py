@@ -32,7 +32,6 @@ import matplotlib
 from datetime import datetime, date, time
 import plotly.graph_objects as go
 
-page = st.sidebar.selectbox("選擇頁面", ["程式交易"])
 
 
 #%%
@@ -536,9 +535,9 @@ st.subheader("程式交易:")
 def ChartOrder_MA(Kbar_df,TR):
 # 檢查 MA_long 欄位是否有 NaN
     if KBar_df['MA_long'].isna().any():
-	last_nan_index_MA_trading = KBar_df['MA_long'].isna()[::-1].idxmax()
+        last_nan_index_MA_trading = KBar_df['MA_long'].isna()[::-1].idxmax()
     else:
-	last_nan_index_MA_trading = -1  # 無 NaN 時，從頭畫起
+        last_nan_index_MA_trading = -1  # 無 NaN 時，從頭畫起
     # # 將K線轉為DataFrame
     # Kbar_df=KbarToDf(KBar)
     # 買(多)方下單點位紀錄
@@ -548,20 +547,20 @@ def ChartOrder_MA(Kbar_df,TR):
     BuyCoverPoint_date = []
     BuyCoverPoint_price = []
     for date,Low,High in zip(Kbar_df['time'],Kbar_df['low'],Kbar_df['high']):
-	# 買方進場
-	if date in [ i[2] for i in BTR ]:
-	    BuyOrderPoint_date.append(date)
-	    BuyOrderPoint_price.append(Low * 0.999)
-	else:
-	    BuyOrderPoint_date.append(np.nan)
-	    BuyOrderPoint_price.append(np.nan)
-	# 買方出場
-	if date in [ i[4] for i in BTR ]:
-	    BuyCoverPoint_date.append(date)
-	    BuyCoverPoint_price.append(High * 1.001)
-	else:
-	    BuyCoverPoint_date.append(np.nan)
-	    BuyCoverPoint_price.append(np.nan)
+        # 買方進場
+        if date in [ i[2] for i in BTR ]:
+            BuyOrderPoint_date.append(date)
+            BuyOrderPoint_price.append(Low * 0.999)
+        else:
+            BuyOrderPoint_date.append(np.nan)
+            BuyOrderPoint_price.append(np.nan)
+        # 買方出場
+        if date in [ i[4] for i in BTR ]:
+            BuyCoverPoint_date.append(date)
+            BuyCoverPoint_price.append(High * 1.001)
+        else:
+            BuyCoverPoint_date.append(np.nan)
+            BuyCoverPoint_price.append(np.nan)
     # # 將下單點位加入副圖物件
     # if [ i for i in BuyOrderPoint if not np.isnan(i) ] !=[]:
     #     addp.append(mpf.make_addplot(BuyOrderPoint,scatter=True,markersize=50,marker='^',color='red'))  ## 200
@@ -573,20 +572,20 @@ def ChartOrder_MA(Kbar_df,TR):
     SellCoverPoint_date = []
     SellCoverPoint_price = []
     for date,Low,High in zip(Kbar_df['time'],Kbar_df['low'],Kbar_df['high']):
-	# 賣方進場
-	if date in [ i[2] for i in STR]:
-	    SellOrderPoint_date.append(date)
-	    SellOrderPoint_price.append(High * 1.001)
-	else:
-	    SellOrderPoint_date.append(np.nan)
-	    SellOrderPoint_price.append(np.nan)
-	# 賣方出場
-	if date in [ i[4] for i in STR ]:
-	    SellCoverPoint_date.append(date)
-	    SellCoverPoint_price.append(Low * 0.999)
-	else:
-	    SellCoverPoint_date.append(np.nan)
-	    SellCoverPoint_price.append(np.nan)
+        # 賣方進場
+        if date in [ i[2] for i in STR]:
+            SellOrderPoint_date.append(date)
+            SellOrderPoint_price.append(High * 1.001)
+        else:
+            SellOrderPoint_date.append(np.nan)
+            SellOrderPoint_price.append(np.nan)
+        # 賣方出場
+        if date in [ i[4] for i in STR ]:
+            SellCoverPoint_date.append(date)
+            SellCoverPoint_price.append(Low * 0.999)
+        else:
+            SellCoverPoint_date.append(np.nan)
+            SellCoverPoint_price.append(np.nan)
     # # 將下單點位加入副圖物件
     # if [ i for i in SellOrderPoint if not np.isnan(i) ] !=[]:
     #     addp.append(mpf.make_addplot(SellOrderPoint,scatter=True,markersize=50,marker='v',color='green'))  ## 200
@@ -595,11 +594,11 @@ def ChartOrder_MA(Kbar_df,TR):
     # ChartKBar(KBar,addp,volume_enable)
     fig5 = make_subplots(specs=[[{"secondary_y": True}]])
     fig5.update_layout(yaxis=dict(fixedrange=False,  # 允許y軸縮放
-				  autorange=True    # 自動調整範圍
-				  ),
-		       xaxis=dict(rangeslider=dict(visible=True)  # 保留下方的範圍滑桿
-				  )
-		       )
+                                  autorange=True    # 自動調整範圍
+                                  ),
+                       xaxis=dict(rangeslider=dict(visible=True)  # 保留下方的範圍滑桿
+                                  )
+                       )
     
     #### include candlestick with rangeselector
     # fig5.add_trace(go.Candlestick(x=KBar_df['time'],
@@ -610,9 +609,9 @@ def ChartOrder_MA(Kbar_df,TR):
     #### include a go.Bar trace for volumes
     # fig5.add_trace(go.Bar(x=KBar_df['time'], y=KBar_df['volume'], name='成交量', marker=dict(color='black')),secondary_y=False)  ## secondary_y=False 表示此圖形的y軸scale是在左邊而不是在右邊
     fig5.add_trace(go.Scatter(x=KBar_df['time'][last_nan_index_MA_trading+1:], y=KBar_df['MA_long'][last_nan_index_MA_trading+1:], mode='lines',line=dict(color='orange', width=2), name=f'{LongMAPeriod}-根 K棒 移動平均線'), 
-		  secondary_y=False)
+                  secondary_y=False)
     fig5.add_trace(go.Scatter(x=KBar_df['time'][last_nan_index_MA_trading+1:], y=KBar_df['MA_short'][last_nan_index_MA_trading+1:], mode='lines',line=dict(color='pink', width=2), name=f'{ShortMAPeriod}-根 K棒 移動平均線'), 
-		  secondary_y=False)
+                  secondary_y=False)
     fig5.add_trace(go.Scatter(x=BuyOrderPoint_date, y=BuyOrderPoint_price, mode='markers',  marker=dict(color='red', symbol='triangle-up', size=10),  name='作多進場點'), secondary_y=False)
     fig5.add_trace(go.Scatter(x=BuyCoverPoint_date, y=BuyCoverPoint_price, mode='markers',  marker=dict(color='blue', symbol='triangle-down', size=10),  name='作多出場點'), secondary_y=False)
     fig5.add_trace(go.Scatter(x=SellOrderPoint_date, y=SellOrderPoint_price, mode='markers',  marker=dict(color='green', symbol='triangle-down', size=10),  name='作空進場點'), secondary_y=False)
@@ -640,74 +639,74 @@ choice_strategy = st.selectbox('選擇交易策略', choices_strategies, index=0
 if choice_strategy == choices_strategies[0]:
     ##### 選擇參數
     with st.expander("<策略參數設定>: 交易停損量、長移動平均線(MA)的K棒週期數目、短移動平均線(MA)的K棒週期數目、購買數量"):
-	MoveStopLoss = st.slider('選擇程式交易停損量(股票:每股價格; 期貨(大小台指):台股指數點數. 例如: 股票進場做多時, 取30代表停損價格為目前每股價格減30元; 大小台指進場做多時, 取30代表停損指數為目前台股指數減30點)', 0, 100, 30, key='MoveStopLoss')
-	LongMAPeriod_trading=st.slider('設定計算長移動平均線(MA)的 K棒週期數目(整數, 例如 10)', 0, 100, 10, key='trading_MA_long')
-	ShortMAPeriod_trading=st.slider('設定計算短移動平均線(MA)的 K棒週期數目(整數, 例如 2)', 0, 100, 2, key='trading_MA_short')
-	Order_Quantity = st.slider('選擇購買數量(股票單位為張數(一張為1000股); 期貨單位為口數)', 1, 100, 1, key='Order_Quantity')
+        MoveStopLoss = st.slider('選擇程式交易停損量(股票:每股價格; 期貨(大小台指):台股指數點數. 例如: 股票進場做多時, 取30代表停損價格為目前每股價格減30元; 大小台指進場做多時, 取30代表停損指數為目前台股指數減30點)', 0, 100, 30, key='MoveStopLoss')
+        LongMAPeriod_trading=st.slider('設定計算長移動平均線(MA)的 K棒週期數目(整數, 例如 10)', 0, 100, 10, key='trading_MA_long')
+        ShortMAPeriod_trading=st.slider('設定計算短移動平均線(MA)的 K棒週期數目(整數, 例如 2)', 0, 100, 2, key='trading_MA_short')
+        Order_Quantity = st.slider('選擇購買數量(股票單位為張數(一張為1000股); 期貨單位為口數)', 1, 100, 1, key='Order_Quantity')
     
-	#### 計算長短移動平均線
-	KBar_df['MA_long'] = Calculate_MA(KBar_df, period=LongMAPeriod_trading)
-	KBar_df['MA_short'] = Calculate_MA(KBar_df, period=ShortMAPeriod_trading)
-	
-	#### 尋找最後 NAN值的位置
-	last_nan_index_MA_trading = KBar_df['MA_long'][::-1].index[KBar_df['MA_long'][::-1].apply(pd.isna)][0]
+        #### 計算長短移動平均線
+        KBar_df['MA_long'] = Calculate_MA(KBar_df, period=LongMAPeriod_trading)
+        KBar_df['MA_short'] = Calculate_MA(KBar_df, period=ShortMAPeriod_trading)
+        
+        #### 尋找最後 NAN值的位置
+        last_nan_index_MA_trading = KBar_df['MA_long'][::-1].index[KBar_df['MA_long'][::-1].apply(pd.isna)][0]
 
 	    
 
 
-	
-	#### 建立部位管理物件
-	OrderRecord=Record() 
-	
-	# ###### 變為字典
-	# # KBar_dic = KBar_df_original.to_dict('list')
-	# KBar_dic = KBar_df.to_dict('list')
-	
+        
+        #### 建立部位管理物件
+        OrderRecord=Record() 
+        
+        # ###### 變為字典
+        # # KBar_dic = KBar_df_original.to_dict('list')
+        # KBar_dic = KBar_df.to_dict('list')
+        
     ##### 開始回測
     for n in range(1,len(KBar_df['time'])-1):
-	# 先判斷long MA的上一筆值是否為空值 再接續判斷策略內容
-	if not np.isnan( KBar_df['MA_long'][n-1] ) :
-	    ## 進場: 如果無未平倉部位 
-	    if OrderRecord.GetOpenInterest()==0 :
-		# 多單進場: 黃金交叉: short MA 向上突破 long MA
-		if KBar_df['MA_short'][n-1] <= KBar_df['MA_long'][n-1] and KBar_df['MA_short'][n] > KBar_df['MA_long'][n] :
-		    OrderRecord.Order('Buy', KBar_df['product'][n+1],KBar_df['time'][n+1],KBar_df['open'][n+1],Order_Quantity)
-		    OrderPrice = KBar_df['open'][n+1]
-		    StopLossPoint = OrderPrice - MoveStopLoss
-		    continue
-		# 空單進場:死亡交叉: short MA 向下突破 long MA
-		if KBar_df['MA_short'][n-1] >= KBar_df['MA_long'][n-1] and KBar_df['MA_short'][n] < KBar_df['MA_long'][n] :
-		    OrderRecord.Order('Sell', KBar_df['product'][n+1],KBar_df['time'][n+1],KBar_df['open'][n+1],Order_Quantity)
-		    OrderPrice = KBar_df['open'][n+1]
-		    StopLossPoint = OrderPrice + MoveStopLoss
-		    continue
-	    # 多單出場: 如果有多單部位   
-	    elif OrderRecord.GetOpenInterest()>0 :
-		## 結算平倉(期貨才使用, 股票除非是下市櫃)
-		if KBar_df['product'][n+1] != KBar_df['product'][n] :
-		    OrderRecord.Cover('Sell', KBar_df['product'][n],KBar_df['time'][n],KBar_df['close'][n],OrderRecord.GetOpenInterest())
-		    continue
-		# 逐筆更新移動停損價位
-		if KBar_df['close'][n] - MoveStopLoss > StopLossPoint :
-		    StopLossPoint = KBar_df['close'][n] - MoveStopLoss
-		# 如果上一根K的收盤價觸及停損價位，則在最新時間出場
-		elif KBar_df['close'][n] < StopLossPoint :
-		    OrderRecord.Cover('Sell', KBar_df['product'][n+1],KBar_df['time'][n+1],KBar_df['open'][n+1],OrderRecord.GetOpenInterest())
-		    continue
-	    # 空單出場: 如果有空單部位
-	    elif OrderRecord.GetOpenInterest()<0 :
-		## 結算平倉(期貨才使用, 股票除非是下市櫃)
-		if KBar_df['product'][n+1] != KBar_df['product'][n] :
-	       
-		    OrderRecord.Cover('Buy', KBar_df['product'][n],KBar_df['time'][n],KBar_df['close'][n],-OrderRecord.GetOpenInterest())
-		    continue
-		# 逐筆更新移動停損價位
-		if KBar_df['close'][n] + MoveStopLoss < StopLossPoint :
-		    StopLossPoint = KBar_df['close'][n] + MoveStopLoss
-		# 如果上一根K的收盤價觸及停損價位，則在最新時間出場
-		elif KBar_df['close'][n] > StopLossPoint :
-		    OrderRecord.Cover('Buy', KBar_df['product'][n+1],KBar_df['time'][n+1],KBar_df['open'][n+1],-OrderRecord.GetOpenInterest())
-		    continue
+        # 先判斷long MA的上一筆值是否為空值 再接續判斷策略內容
+        if not np.isnan( KBar_df['MA_long'][n-1] ) :
+            ## 進場: 如果無未平倉部位 
+            if OrderRecord.GetOpenInterest()==0 :
+                # 多單進場: 黃金交叉: short MA 向上突破 long MA
+                if KBar_df['MA_short'][n-1] <= KBar_df['MA_long'][n-1] and KBar_df['MA_short'][n] > KBar_df['MA_long'][n] :
+                    OrderRecord.Order('Buy', KBar_df['product'][n+1],KBar_df['time'][n+1],KBar_df['open'][n+1],Order_Quantity)
+                    OrderPrice = KBar_df['open'][n+1]
+                    StopLossPoint = OrderPrice - MoveStopLoss
+                    continue
+                # 空單進場:死亡交叉: short MA 向下突破 long MA
+                if KBar_df['MA_short'][n-1] >= KBar_df['MA_long'][n-1] and KBar_df['MA_short'][n] < KBar_df['MA_long'][n] :
+                    OrderRecord.Order('Sell', KBar_df['product'][n+1],KBar_df['time'][n+1],KBar_df['open'][n+1],Order_Quantity)
+                    OrderPrice = KBar_df['open'][n+1]
+                    StopLossPoint = OrderPrice + MoveStopLoss
+                    continue
+            # 多單出場: 如果有多單部位   
+            elif OrderRecord.GetOpenInterest()>0 :
+                ## 結算平倉(期貨才使用, 股票除非是下市櫃)
+                if KBar_df['product'][n+1] != KBar_df['product'][n] :
+                    OrderRecord.Cover('Sell', KBar_df['product'][n],KBar_df['time'][n],KBar_df['close'][n],OrderRecord.GetOpenInterest())
+                    continue
+                # 逐筆更新移動停損價位
+                if KBar_df['close'][n] - MoveStopLoss > StopLossPoint :
+                    StopLossPoint = KBar_df['close'][n] - MoveStopLoss
+                # 如果上一根K的收盤價觸及停損價位，則在最新時間出場
+                elif KBar_df['close'][n] < StopLossPoint :
+                    OrderRecord.Cover('Sell', KBar_df['product'][n+1],KBar_df['time'][n+1],KBar_df['open'][n+1],OrderRecord.GetOpenInterest())
+                    continue
+            # 空單出場: 如果有空單部位
+            elif OrderRecord.GetOpenInterest()<0 :
+                ## 結算平倉(期貨才使用, 股票除非是下市櫃)
+                if KBar_df['product'][n+1] != KBar_df['product'][n] :
+               
+                    OrderRecord.Cover('Buy', KBar_df['product'][n],KBar_df['time'][n],KBar_df['close'][n],-OrderRecord.GetOpenInterest())
+                    continue
+                # 逐筆更新移動停損價位
+                if KBar_df['close'][n] + MoveStopLoss < StopLossPoint :
+                    StopLossPoint = KBar_df['close'][n] + MoveStopLoss
+                # 如果上一根K的收盤價觸及停損價位，則在最新時間出場
+                elif KBar_df['close'][n] > StopLossPoint :
+                    OrderRecord.Cover('Buy', KBar_df['product'][n+1],KBar_df['time'][n+1],KBar_df['open'][n+1],-OrderRecord.GetOpenInterest())
+                    continue
 
     ##### 繪製K線圖加上MA以及下單點位    
     ChartOrder_MA(KBar_df,OrderRecord.GetTradeRecord())
@@ -716,9 +715,9 @@ if choice_strategy == choices_strategies[0]:
 #VWAP
 if choice_strategy == choices_strategies[1]:  # VWAP 策略
     with st.expander("<策略參數設定>: VWAP 偏移百分比、停損點數、下單數量"):
-	offset_range = st.slider("VWAP 偏移百分比（%）", 0, 10, (1, 3), key='VWAP_Offset')
-	MoveStopLoss = st.slider('停損點數', 0, 100, 30, key='VWAP_StopLoss')
-	Order_Quantity = st.slider('下單數量', 1, 100, 1, key='VWAP_Qty')
+        offset_range = st.slider("VWAP 偏移百分比（%）", 0, 10, (1, 3), key='VWAP_Offset')
+        MoveStopLoss = st.slider('停損點數', 0, 100, 30, key='VWAP_StopLoss')
+        Order_Quantity = st.slider('下單數量', 1, 100, 1, key='VWAP_Qty')
 
     OrderRecord = Record()
     run_strategy_VWAP(KBar_df, offset_range[0], MoveStopLoss, Order_Quantity, OrderRecord)
@@ -830,9 +829,9 @@ def 計算績效_股票():
     最大連續虧損 = OrderRecord.GetAccLoss()*1000               ## 最大連續虧損
     最大盈虧回落_MDD = OrderRecord.GetMDD()*1000                   ## 最大利潤(盈虧)回落(MDD). 這個不是一般的 "資金" 或 "投資報酬率" 的回落
     if 最大盈虧回落_MDD>0:
-	報酬風險比 = 交易總盈虧/最大盈虧回落_MDD
+        報酬風險比 = 交易總盈虧/最大盈虧回落_MDD
     else:
-	報酬風險比='資料不足無法計算'
+        報酬風險比='資料不足無法計算'
     return 交易總盈虧,平均每次盈虧,平均投資報酬率,平均獲利_只看獲利的,平均虧損_只看虧損的,勝率,最大連續虧損,最大盈虧回落_MDD,報酬風險比
 
 
@@ -846,9 +845,9 @@ def 計算績效_大台指期貨():
     最大連續虧損 = OrderRecord.GetAccLoss()*200               ## 最大連續虧損
     最大盈虧回落_MDD = OrderRecord.GetMDD()*200                   ## 最大利潤(盈虧)回落(MDD). 這個不是一般的 "資金" 或 "投資報酬率" 的回落
     if 最大盈虧回落_MDD>0:
-	報酬風險比 = 交易總盈虧/最大盈虧回落_MDD
+        報酬風險比 = 交易總盈虧/最大盈虧回落_MDD
     else:
-	報酬風險比='資料不足無法計算'
+        報酬風險比='資料不足無法計算'
     return 交易總盈虧,平均每次盈虧,平均投資報酬率,平均獲利_只看獲利的,平均虧損_只看虧損的,勝率,最大連續虧損,最大盈虧回落_MDD,報酬風險比
 
 
@@ -862,9 +861,9 @@ def 計算績效_小台指期貨():
     最大連續虧損 = OrderRecord.GetAccLoss()*50               ## 最大連續虧損
     最大盈虧回落_MDD = OrderRecord.GetMDD()*50                   ## 最大利潤(盈虧)回落(MDD). 這個不是一般的 "資金" 或 "投資報酬率" 的回落
     if 最大盈虧回落_MDD>0:
-	報酬風險比 = 交易總盈虧/最大盈虧回落_MDD
+        報酬風險比 = 交易總盈虧/最大盈虧回落_MDD
     else:
-	報酬風險比='資料不足無法計算'
+        報酬風險比='資料不足無法計算'
     return 交易總盈虧,平均每次盈虧,平均投資報酬率,平均獲利_只看獲利的,平均虧損_只看虧損的,勝率,最大連續虧損,最大盈虧回落_MDD,報酬風險比
 
 
@@ -947,12 +946,12 @@ if choice == choices[4] :   #'堤維西2020.1.2 至 2024.4.12':
 ##### 将投資績效存储成一个DataFrame並以表格形式呈現各項績效數據
 if len(OrderRecord.Profit)>0:
     data = {
-	"項目": ["交易總盈虧(元)", "平均每次盈虧(元)", "平均投資報酬率", "平均獲利(只看獲利的)(元)", "平均虧損(只看虧損的)(元)", "勝率", "最大連續虧損(元)", "最大盈虧回落(MDD)(元)", "報酬風險比(交易總盈虧/最大盈虧回落(MDD))"],
-	"數值": [交易總盈虧, 平均每次盈虧, 平均投資報酬率, 平均獲利_只看獲利的, 平均虧損_只看虧損的, 勝率, 最大連續虧損, 最大盈虧回落_MDD, 報酬風險比]
+        "項目": ["交易總盈虧(元)", "平均每次盈虧(元)", "平均投資報酬率", "平均獲利(只看獲利的)(元)", "平均虧損(只看虧損的)(元)", "勝率", "最大連續虧損(元)", "最大盈虧回落(MDD)(元)", "報酬風險比(交易總盈虧/最大盈虧回落(MDD))"],
+        "數值": [交易總盈虧, 平均每次盈虧, 平均投資報酬率, 平均獲利_只看獲利的, 平均虧損_只看虧損的, 勝率, 最大連續虧損, 最大盈虧回落_MDD, 報酬風險比]
     }
     df = pd.DataFrame(data)
     if len(df)>0:
-	st.write(df)
+        st.write(df)
 else:
     st.write('沒有交易記錄(已經了結之交易) !')
 
@@ -1115,7 +1114,7 @@ if choice_strategy == choices_strategies[0]:
 	
 	for short_p, long_p, sl in itertools.product(short_range, long_range, stoploss_range):
 	    if short_p >= long_p:
-		continue  # 短均線要比長均線小
+	        continue  # 短均線要比長均線小
 	    
 	    record = Record()
 	    df_copy = KBar_df.copy()  # 防止原始資料污染
@@ -1124,8 +1123,8 @@ if choice_strategy == choices_strategies[0]:
 	    
 	    profit = record.GetTotalProfit()
 	    if profit > best_profit:
-		best_profit = profit
-		best_params = (short_p, long_p, sl)
+	        best_profit = profit
+	        best_params = (short_p, long_p, sl)
 	
 	print("最佳參數：", best_params)
 	print("最高獲利：", best_profit)
@@ -1160,19 +1159,19 @@ if choice_strategy == choices_strategies[0]:
 	    results = []
 	
 	    for short in range(short_range[0], short_range[1] + 1):
-		for long in range(long_range[0], long_range[1] + 1):
-		    if short >= long:
-			continue
-		    for sl in range(stoploss_range[0], stoploss_range[1] + 1, 5):  # 停損每5點一格
-			record = Record()
-			df_copy = KBar_df.copy()
-			run_strategy(df_copy, short, long, sl, record)
-			profit = record.GetTotalProfit()
-			results.append((short, long, sl, profit))
+	        for long in range(long_range[0], long_range[1] + 1):
+	            if short >= long:
+	                continue
+	            for sl in range(stoploss_range[0], stoploss_range[1] + 1, 5):  # 停損每5點一格
+	                record = Record()
+	                df_copy = KBar_df.copy()
+	                run_strategy(df_copy, short, long, sl, record)
+	                profit = record.GetTotalProfit()
+	                results.append((short, long, sl, profit))
 	
-			if profit > best_profit:
-			    best_profit = profit
-			    best_params = (short, long, sl)
+	                if profit > best_profit:
+	                    best_profit = profit
+	                    best_params = (short, long, sl)
 	
 	    st.success(f"最佳參數：短MA={best_params[0]}, 長MA={best_params[1]}, 停損={best_params[2]}，總獲利={best_profit:.2f}")
 	
@@ -1205,40 +1204,40 @@ if choice_strategy == choices_strategies[1]:  # VWAP 策略
     optimize_vwap = st.button("執行 VWAP 策略窮舉最佳化")
 
     if optimize_vwap:
-	best_profit = -np.inf
-	best_params = None
-	results = []
+        best_profit = -np.inf
+        best_params = None
+        results = []
 
-	for offset in range(offset_range[0], offset_range[1] + 1):
-	    for sl in range(stoploss_range[0], stoploss_range[1] + 1, 5):  # 每 5 點一格
-		record = Record()
-		df_copy = KBar_df.copy()
-		run_strategy_VWAP(df_copy, offset, sl, order_qty, record)
-		profit = record.GetTotalProfit()
-		results.append((offset, sl, profit))
+        for offset in range(offset_range[0], offset_range[1] + 1):
+            for sl in range(stoploss_range[0], stoploss_range[1] + 1, 5):  # 每 5 點一格
+                record = Record()
+                df_copy = KBar_df.copy()
+                run_strategy_VWAP(df_copy, offset, sl, order_qty, record)
+                profit = record.GetTotalProfit()
+                results.append((offset, sl, profit))
 
-		if profit > best_profit:
-		    best_profit = profit
-		    best_params = (offset, sl)
+                if profit > best_profit:
+                    best_profit = profit
+                    best_params = (offset, sl)
 
-	# 顯示最佳組合
-	st.success(f"最佳 VWAP 參數：偏移={best_params[0]}%、停損={best_params[1]}，總獲利={best_profit:.2f}")
+        # 顯示最佳組合
+        st.success(f"最佳 VWAP 參數：偏移={best_params[0]}%、停損={best_params[1]}，總獲利={best_profit:.2f}")
 
-	# 顯示表格
-	df_result = pd.DataFrame(results, columns=["VWAP偏移(%)", "停損", "總獲利"])
-	st.subheader("VWAP 策略績效")
-	st.dataframe(df_result.sort_values(by="總獲利", ascending=False).reset_index(drop=True))
+        # 顯示表格
+        df_result = pd.DataFrame(results, columns=["VWAP偏移(%)", "停損", "總獲利"])
+        st.subheader("VWAP 策略績效")
+        st.dataframe(df_result.sort_values(by="總獲利", ascending=False).reset_index(drop=True))
 
-	# Altair 視覺化
-	import altair as alt
-	chart = alt.Chart(df_result).mark_circle(size=60).encode(
-	    x='VWAP偏移(%):Q',
-	    y='停損:Q',
-	    color='總獲利:Q',
-	    tooltip=['VWAP偏移(%)', '停損', '總獲利']
-	).interactive()
+        # Altair 視覺化
+        import altair as alt
+        chart = alt.Chart(df_result).mark_circle(size=60).encode(
+            x='VWAP偏移(%):Q',
+            y='停損:Q',
+            color='總獲利:Q',
+            tooltip=['VWAP偏移(%)', '停損', '總獲利']
+        ).interactive()
 
-	st.altair_chart(chart, use_container_width=True)
+        st.altair_chart(chart, use_container_width=True)
 
 #%%
 ####### (7) 呈現即時資料 #######
