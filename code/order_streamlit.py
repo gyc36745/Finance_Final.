@@ -413,55 +413,56 @@ def run_strategy_VWAP(df, offset_percent, stop_loss, qty, record):
     offset_ratio = offset_percent / 100
     StopLossPoint = None
 
-    for n in range(1, len(df) - 1):
-        vwap_prev = df['VWAP'].iloc[n - 1]
-        close_prev = df['close'].iloc[n - 1]
-        vwap_curr = df['VWAP'].iloc[n]
-        close_curr = df['close'].iloc[n]
+   for n in range(1, len(df) - 1):
+    if n + 1 >= len(df):
+        break  # 防止超出索引
 
-        if np.isnan(vwap_prev) or np.isnan(vwap_curr):
+    # 以下安全使用 n+1 索引
+    vwap_prev = df['VWAP'].iloc[n - 1]
+    close_prev = df['close'].iloc[n - 1]
+    vwap_curr = df['VWAP'].iloc[n]
+    close_curr = df['close'].iloc[n]
+
+    if np.isnan(vwap_prev) or np.isnan(vwap_curr):
+        continue
+
+    # 無部位進場
+    if record.GetOpenInterest() == 0:
+        if close_prev < vwap_prev * (1 - offset_ratio) and close_curr > vwap_curr:
+            price = df['open'].iloc[n + 1]
+            record.Order('Buy', df['product'].iloc[n + 1], df['time'].iloc[n + 1], price, qty)
+            StopLossPoint = price - stop_loss
             continue
 
-        # 無部位：進場邏輯
-        if record.GetOpenInterest() == 0:
-            # 多單：從 VWAP 偏移下方反彈向上
-            if close_prev < vwap_prev * (1 - offset_ratio) and close_curr > vwap_curr:
-                price = df['open'].iloc[n + 1]
-                record.Order('Buy', df['product'].iloc[n + 1], df['time'].iloc[n + 1], price, qty)
-                StopLossPoint = price - stop_loss
-                continue
+        elif close_prev > vwap_prev * (1 + offset_ratio) and close_curr < vwap_curr:
+            price = df['open'].iloc[n + 1]
+            record.Order('Sell', df['product'].iloc[n + 1], df['time'].iloc[n + 1], price, qty)
+            StopLossPoint = price + stop_loss
+            continue
 
-            # 空單：從 VWAP 偏移上方下跌突破
-            elif close_prev > vwap_prev * (1 + offset_ratio) and close_curr < vwap_curr:
-                price = df['open'].iloc[n + 1]
-                record.Order('Sell', df['product'].iloc[n + 1], df['time'].iloc[n + 1], price, qty)
-                StopLossPoint = price + stop_loss
-                continue
+    # 有多單部位
+    elif record.GetOpenInterest() > 0:
+        if df['product'].iloc[n + 1] != df['product'].iloc[n]:
+            record.Cover('Sell', df['product'].iloc[n], df['time'].iloc[n], df['close'].iloc[n], record.GetOpenInterest())
+            continue
 
-        # 有多單：檢查移動停損 or 換商品平倉
-        elif record.GetOpenInterest() > 0:
-            if df['product'].iloc[n + 1] != df['product'].iloc[n]:
-                record.Cover('Sell', df['product'].iloc[n], df['time'].iloc[n], df['close'].iloc[n], record.GetOpenInterest())
-                continue
+        if df['close'].iloc[n] - stop_loss > StopLossPoint:
+            StopLossPoint = df['close'].iloc[n] - stop_loss
+        elif df['close'].iloc[n] < StopLossPoint:
+            record.Cover('Sell', df['product'].iloc[n + 1], df['time'].iloc[n + 1], df['open'].iloc[n + 1], record.GetOpenInterest())
+            continue
 
-            # 更新移動停損線
-            if df['close'].iloc[n] - stop_loss > StopLossPoint:
-                StopLossPoint = df['close'].iloc[n] - stop_loss
-            elif df['close'].iloc[n] < StopLossPoint:
-                record.Cover('Sell', df['product'].iloc[n + 1], df['time'].iloc[n + 1], df['open'].iloc[n + 1], record.GetOpenInterest())
-                continue
+    # 有空單部位
+    elif record.GetOpenInterest() < 0:
+        if df['product'].iloc[n + 1] != df['product'].iloc[n]:
+            record.Cover('Buy', df['product'].iloc[n], df['time'].iloc[n], df['close'].iloc[n], -record.GetOpenInterest())
+            continue
 
-        # 有空單：同理
-        elif record.GetOpenInterest() < 0:
-            if df['product'].iloc[n + 1] != df['product'].iloc[n]:
-                record.Cover('Buy', df['product'].iloc[n], df['time'].iloc[n], df['close'].iloc[n], -record.GetOpenInterest())
-                continue
-
-            if df['close'].iloc[n] + stop_loss < StopLossPoint:
-                StopLossPoint = df['close'].iloc[n] + stop_loss
-            elif df['close'].iloc[n] > StopLossPoint:
-                record.Cover('Buy', df['product'].iloc[n + 1], df['time'].iloc[n + 1], df['open'].iloc[n + 1], -record.GetOpenInterest())
-                continue
+        if df['close'].iloc[n] + stop_loss < StopLossPoint:
+            StopLossPoint = df['close'].iloc[n] + stop_loss
+        elif df['close'].iloc[n] > StopLossPoint:
+            record.Cover('Buy', df['product'].iloc[n + 1], df['time'].iloc[n + 1], df['open'].iloc[n + 1], -record.GetOpenInterest())
+            continue
 
     
         
