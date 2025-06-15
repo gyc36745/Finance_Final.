@@ -1181,7 +1181,7 @@ OrderRecord.GeneratorProfit_rateChart(StrategyName='MA')
 st.subheader("策略參數最佳化")
 
 import itertools
-#from itertools import product
+from itertools import product
 
 short_range = range(3, 10)
 long_range = range(10, 30, 5)
