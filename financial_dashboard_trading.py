@@ -1150,6 +1150,41 @@ if choice_strategy == choices_strategies[0]:
 	#st.subheader("原始 K 線資料")
 	#st.dataframe(KBar_df.head())
 	# -- 執行最佳化邏輯 --
+	if optimize:
+	    best_profit = -np.inf
+	    best_params = None
+	    results = []
+	
+	    for short in range(short_range[0], short_range[1] + 1):
+		for long in range(long_range[0], long_range[1] + 1):
+		    if short >= long:
+			continue
+		    for sl in range(stoploss_range[0], stoploss_range[1] + 1, 5):  # 停損每5點一格
+			record = Record()
+			df_copy = KBar_df.copy()
+			run_strategy(df_copy, short, long, sl, record)
+			profit = record.GetTotalProfit()
+			results.append((short, long, sl, profit))
+	
+			if profit > best_profit:
+			    best_profit = profit
+			    best_params = (short, long, sl)
+	
+	    st.success(f"最佳參數：短MA={best_params[0]}, 長MA={best_params[1]}, 停損={best_params[2]}，總獲利={best_profit:.2f}")
+	
+	    df_result = pd.DataFrame(results, columns=["short_MA", "long_MA", "StopLoss", "TotalProfit"])
+	    st.subheader("所有參數組合績效")
+	    st.dataframe(df_result.sort_values(by="TotalProfit", ascending=False).reset_index(drop=True))
+	
+	    import altair as alt
+	    chart = alt.Chart(df_result).mark_circle(size=60).encode(
+		x='short_MA:Q',
+		y='long_MA:Q',
+		color='TotalProfit:Q',
+		tooltip=['short_MA', 'long_MA', 'StopLoss', 'TotalProfit']
+	    ).interactive()
+	
+	    st.altair_chart(chart, use_container_width=True)
 '''
 	if optimize:
 	    best_profit = -np.inf
@@ -1192,41 +1227,7 @@ if choice_strategy == choices_strategies[0]:
 '''
 	
 
-	if optimize:
-	    best_profit = -np.inf
-	    best_params = None
-	    results = []
-	
-	    for short in range(short_range[0], short_range[1] + 1):
-	        for long in range(long_range[0], long_range[1] + 1):
-	            if short >= long:
-	                continue
-	            for sl in range(stoploss_range[0], stoploss_range[1] + 1, 5):  # 停損每5點一格
-	                record = Record()
-	                df_copy = KBar_df.copy()
-	                run_strategy(df_copy, short, long, sl, record)
-	                profit = record.GetTotalProfit()
-	                results.append((short, long, sl, profit))
-	
-	                if profit > best_profit:
-	                    best_profit = profit
-	                    best_params = (short, long, sl)
-	
-	    st.success(f"最佳參數：短MA={best_params[0]}, 長MA={best_params[1]}, 停損={best_params[2]}，總獲利={best_profit:.2f}")
-	
-	    df_result = pd.DataFrame(results, columns=["short_MA", "long_MA", "StopLoss", "TotalProfit"])
-	    st.subheader("所有參數組合績效")
-	    st.dataframe(df_result.sort_values(by="TotalProfit", ascending=False).reset_index(drop=True))
-	
-	    import altair as alt
-	    chart = alt.Chart(df_result).mark_circle(size=60).encode(
-		x='short_MA:Q',
-		y='long_MA:Q',
-		color='TotalProfit:Q',
-		tooltip=['short_MA', 'long_MA', 'StopLoss', 'TotalProfit']
-	    ).interactive()
-	
-	    st.altair_chart(chart, use_container_width=True)
+
 
 
 
