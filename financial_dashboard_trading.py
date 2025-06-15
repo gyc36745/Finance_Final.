@@ -712,94 +712,13 @@ if choice_strategy == choices_strategies[0]:
 
 #VWAP
 if choice_strategy == choices_strategies[1]:  # VWAP 策略
-    ##### 策略參數設定區
-    with st.expander("<策略參數設定>: 交易停損量、購買數量"):
-	offset_range = st.sidebar.slider("VWAP 偏移百分比（%）", 0, 10, (1, 3), key='VWAP_Offset')
-        MoveStopLoss = st.slider('設定停損點數（股票每股價格 / 期貨指數點數）', 0, 100, 30, key='VWAP_StopLoss')
-        Order_Quantity = st.slider('設定下單數量（股票張數 / 期貨口數）', 1, 100, 1, key='VWAP_Qty')
-	
+    offset_range = st.sidebar.slider("VWAP 偏移百分比（%）", 0, 10, (1, 3), key='VWAP_Offset')
+    MoveStopLoss = st.slider('停損點數', 0, 100, 30, key='VWAP_StopLoss')
+    Order_Quantity = st.slider('下單數量', 1, 100, 1, key='VWAP_Qty')
 
-    ##### 計算 VWAP
-    KBar_df = calculate_vwap(KBar_df)
-
-    ##### 建立部位管理物件
     OrderRecord = Record()
+    run_strategy_VWAP(KBar_df, offset_range[0], MoveStopLoss, Order_Quantity, OrderRecord)
 
-    ##### 回測主迴圈
-    for n in range(1, len(KBar_df) - 1):
-        # 用 iloc 確保位置索引安全取值，避免 KeyError
-        vwap_prev = KBar_df['VWAP'].iloc[n-1] if (n-1) < len(KBar_df) else np.nan
-        if np.isnan(vwap_prev):
-            continue
-        
-        close_prev = KBar_df['close'].iloc[n-1]
-        vwap_curr = KBar_df['VWAP'].iloc[n]
-        close_curr = KBar_df['close'].iloc[n]
-
-        # 無部位，進場邏輯
-        if OrderRecord.GetOpenInterest() == 0:
-            # 多單進場：價格向上突破 VWAP
-            if close_prev < vwap_prev and close_curr > vwap_curr:
-                OrderRecord.Order('Buy', 
-                                  KBar_df['product'].iloc[n+1], 
-                                  KBar_df['time'].iloc[n+1], 
-                                  KBar_df['open'].iloc[n+1], 
-                                  Order_Quantity)
-                OrderPrice = KBar_df['open'].iloc[n+1]
-                StopLossPoint = OrderPrice - MoveStopLoss
-                continue
-            # 空單進場：價格向下跌破 VWAP
-            elif close_prev > vwap_prev and close_curr < vwap_curr:
-                OrderRecord.Order('Sell', 
-                                  KBar_df['product'].iloc[n+1], 
-                                  KBar_df['time'].iloc[n+1], 
-                                  KBar_df['open'].iloc[n+1], 
-                                  Order_Quantity)
-                OrderPrice = KBar_df['open'].iloc[n+1]
-                StopLossPoint = OrderPrice + MoveStopLoss
-                continue
-
-        # 多單出場
-        elif OrderRecord.GetOpenInterest() > 0:
-            # 商品更換時平倉
-            if KBar_df['product'].iloc[n+1] != KBar_df['product'].iloc[n]:
-                OrderRecord.Cover('Sell', 
-                                  KBar_df['product'].iloc[n], 
-                                  KBar_df['time'].iloc[n], 
-                                  KBar_df['close'].iloc[n], 
-                                  OrderRecord.GetOpenInterest())
-                continue
-            # 更新移動停損
-            if KBar_df['close'].iloc[n] - MoveStopLoss > StopLossPoint:
-                StopLossPoint = KBar_df['close'].iloc[n] - MoveStopLoss
-            elif KBar_df['close'].iloc[n] < StopLossPoint:
-                OrderRecord.Cover('Sell', 
-                                  KBar_df['product'].iloc[n+1], 
-                                  KBar_df['time'].iloc[n+1], 
-                                  KBar_df['open'].iloc[n+1], 
-                                  OrderRecord.GetOpenInterest())
-                continue
-
-        # 空單出場
-        elif OrderRecord.GetOpenInterest() < 0:
-            if KBar_df['product'].iloc[n+1] != KBar_df['product'].iloc[n]:
-                OrderRecord.Cover('Buy', 
-                                  KBar_df['product'].iloc[n], 
-                                  KBar_df['time'].iloc[n], 
-                                  KBar_df['close'].iloc[n], 
-                                  -OrderRecord.GetOpenInterest())
-                continue
-            if KBar_df['close'].iloc[n] + MoveStopLoss < StopLossPoint:
-                StopLossPoint = KBar_df['close'].iloc[n] + MoveStopLoss
-            elif KBar_df['close'].iloc[n] > StopLossPoint:
-                OrderRecord.Cover('Buy', 
-                                  KBar_df['product'].iloc[n+1], 
-                                  KBar_df['time'].iloc[n+1], 
-                                  KBar_df['open'].iloc[n+1], 
-                                  -OrderRecord.GetOpenInterest())
-                continue
-
-    ##### 繪圖
     ChartOrder_MA(KBar_df, OrderRecord.GetTradeRecord())
 
 
