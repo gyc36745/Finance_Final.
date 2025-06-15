@@ -199,7 +199,7 @@ def Change_Cycle(Date,cycle_duration,KBar_dic,product_name):
 ###### 改變日期資料型態
 Date = start_date.strftime("%Y-%m-%d")  ## 變成字串
 
-
+st.markdown("---")
 st.subheader("設定技術指標視覺化圖形之相關參數:")
 
 ###### 設定 K 棒的時間長度(分鐘): 
@@ -385,7 +385,6 @@ KBar_df = calculate_ema(KBar_df)
 
 #%%
 ####### (5) 畫圖 #######
-st.markdown("---")
 st.subheader("技術指標視覺化圖形")
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
