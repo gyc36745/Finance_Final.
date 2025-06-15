@@ -385,6 +385,7 @@ KBar_df = calculate_ema(KBar_df)
 
 #%%
 ####### (5) 畫圖 #######
+st.markdown("---")
 st.subheader("技術指標視覺化圖形")
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -524,6 +525,7 @@ with st.expander("K線圖, VWAP"):
 
 #%%
 ####### (6) 程式交易 #######
+st.markdown("---")
 st.subheader("程式交易:")
 
 
