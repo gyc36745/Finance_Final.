@@ -720,7 +720,7 @@ if choice_strategy == choices_strategies[1]:  # VWAP 策略
 
     ##### 回測主迴圈
     for n in range(1, len(KBar_df) - 1):
-        if np.isnan(KBar_df['VWAP'][n-1]):
+        if np.isnan(KBar_df['VWAP'].iloc[n-1]):
             continue
 
         # 無部位，進場邏輯
