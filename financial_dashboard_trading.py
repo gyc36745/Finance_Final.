@@ -1188,38 +1188,51 @@ if choice_strategy == choices_strategies[0]:
 	    st.altair_chart(chart, use_container_width=True)
 
 
-if  choice_strategy == choices_strategies[1]:  # VWAP 策略
-    best_profit = -np.inf
-    best_params = None
-    results = []
+if choice_strategy == choices_strategies[1]:  # VWAP 策略
+    st.markdown("<h5>選取 VWAP 策略參數範圍</h5>", unsafe_allow_html=True)
 
-    for offset in range(offset_range[0], offset_range[1] + 1):
-        for sl in [MoveStopLoss]:
-            record = Record()
-            df_copy = KBar_df.copy()
-            run_strategy_VWAP(df_copy, offset, sl, record, Order_Quantity)
-            profit = record.GetTotalProfit()
-            results.append((offset, sl, profit))
+    # 1. 讓使用者自訂偏移範圍與停損值
+    offset_range = st.slider("VWAP 偏移百分比範圍（%）", 0, 10, (1, 3), key='VWAP_Offset_Range')
+    stoploss_range = st.slider("停損點數範圍", 1, 100, (10, 50), key='VWAP_StopLoss_Range')
+    order_qty = st.slider("下單數量", 1, 100, 1, key='VWAP_Qty')
 
-            if profit > best_profit:
-                best_profit = profit
-                best_params = (offset, sl)
+    optimize_vwap = st.button("執行 VWAP 策略窮舉最佳化")
 
-    st.success(f"最佳 VWAP 參數：偏移={best_params[0]}%、停損={best_params[1]}，總獲利={best_profit:.2f}")
+    if optimize_vwap:
+        best_profit = -np.inf
+        best_params = None
+        results = []
 
-    df_result = pd.DataFrame(results, columns=["VWAP偏移(%)", "停損", "總獲利"])
-    st.subheader("VWAP 策略績效")
-    st.dataframe(df_result.sort_values(by="總獲利", ascending=False).reset_index(drop=True))
+        for offset in range(offset_range[0], offset_range[1] + 1):
+            for sl in range(stoploss_range[0], stoploss_range[1] + 1, 5):  # 每 5 點一格
+                record = Record()
+                df_copy = KBar_df.copy()
+                run_strategy_VWAP(df_copy, offset, sl, record, order_qty)
+                profit = record.GetTotalProfit()
+                results.append((offset, sl, profit))
 
-    import altair as alt
-    chart = alt.Chart(df_result).mark_circle(size=60).encode(
-        x='VWAP偏移(%)',
-        y='停損',
-        color='總獲利',
-        tooltip=['VWAP偏移(%)', '停損', '總獲利']
-    ).interactive()
+                if profit > best_profit:
+                    best_profit = profit
+                    best_params = (offset, sl)
 
-    st.altair_chart(chart, use_container_width=True)
+        # 顯示最佳組合
+        st.success(f"最佳 VWAP 參數：偏移={best_params[0]}%、停損={best_params[1]}，總獲利={best_profit:.2f}")
+
+        # 顯示表格
+        df_result = pd.DataFrame(results, columns=["VWAP偏移(%)", "停損", "總獲利"])
+        st.subheader("VWAP 策略績效")
+        st.dataframe(df_result.sort_values(by="總獲利", ascending=False).reset_index(drop=True))
+
+        # Altair 視覺化
+        import altair as alt
+        chart = alt.Chart(df_result).mark_circle(size=60).encode(
+            x='VWAP偏移(%):Q',
+            y='停損:Q',
+            color='總獲利:Q',
+            tooltip=['VWAP偏移(%)', '停損', '總獲利']
+        ).interactive()
+
+        st.altair_chart(chart, use_container_width=True)
 
 #%%
 ####### (7) 呈現即時資料 #######
