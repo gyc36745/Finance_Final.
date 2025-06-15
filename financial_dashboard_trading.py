@@ -613,7 +613,12 @@ def ChartOrder_MA(Kbar_df,TR):
 
 #%%
 ###### 選擇不同交易策略:
-choices_strategies = ['<進場>: 移動平均線黃金交叉作多,死亡交叉作空. <出場>: 結算平倉(期貨), 移動停損.']
+#choices_strategies = ['<進場>: 移動平均線黃金交叉作多,死亡交叉作空. <出場>: 結算平倉(期貨), 移動停損.']
+choices_strategies = [
+    '<進場>: 移動平均線黃金交叉作多,死亡交叉作空. <出場>: 結算平倉(期貨), 移動停損.',
+    '<進場>: VWAP 上穿做多，下穿做空. <出場>: VWAP 反向突破 或 移動停損.',
+    '<進場>: 布林通道下軌反彈做多，上軌回檔做空. <出場>: 中軌 或 移動停損.'
+]
 choice_strategy = st.selectbox('選擇交易策略', choices_strategies, index=0)
 
 
@@ -692,6 +697,69 @@ if choice_strategy == choices_strategies[0]:
 
     ##### 繪製K線圖加上MA以及下單點位    
     ChartOrder_MA(KBar_df,OrderRecord.GetTradeRecord())
+
+
+#VWAP
+if choice_strategy == choices_strategies[1]:  # VWAP 策略
+    ##### 策略參數設定區
+    with st.expander("<策略參數設定>: 交易停損量、購買數量"):
+        MoveStopLoss = st.slider('設定停損點數（股票每股價格 / 期貨指數點數）', 0, 100, 30, key='VWAP_StopLoss')
+        Order_Quantity = st.slider('設定下單數量（股票張數 / 期貨口數）', 1, 100, 1, key='VWAP_Qty')
+
+    ##### 計算 VWAP
+    KBar_df['VWAP'] = calculate_vwap(KBar_df)
+
+    ##### 建立部位管理物件
+    OrderRecord = Record()
+
+    ##### 回測主迴圈
+    for n in range(1, len(KBar_df) - 1):
+        if np.isnan(KBar_df['VWAP'][n-1]):
+            continue
+
+        # 無部位，進場邏輯
+        if OrderRecord.GetOpenInterest() == 0:
+            # 多單進場：價格向上突破 VWAP
+            if KBar_df['close'][n-1] < KBar_df['VWAP'][n-1] and KBar_df['close'][n] > KBar_df['VWAP'][n]:
+                OrderRecord.Order('Buy', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], Order_Quantity)
+                OrderPrice = KBar_df['open'][n+1]
+                StopLossPoint = OrderPrice - MoveStopLoss
+                continue
+            # 空單進場：價格向下跌破 VWAP
+            elif KBar_df['close'][n-1] > KBar_df['VWAP'][n-1] and KBar_df['close'][n] < KBar_df['VWAP'][n]:
+                OrderRecord.Order('Sell', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], Order_Quantity)
+                OrderPrice = KBar_df['open'][n+1]
+                StopLossPoint = OrderPrice + MoveStopLoss
+                continue
+
+        # 多單出場
+        elif OrderRecord.GetOpenInterest() > 0:
+            # 商品更換時平倉
+            if KBar_df['product'][n+1] != KBar_df['product'][n]:
+                OrderRecord.Cover('Sell', KBar_df['product'][n], KBar_df['time'][n], KBar_df['close'][n], OrderRecord.GetOpenInterest())
+                continue
+            # 更新移動停損
+            if KBar_df['close'][n] - MoveStopLoss > StopLossPoint:
+                StopLossPoint = KBar_df['close'][n] - MoveStopLoss
+            elif KBar_df['close'][n] < StopLossPoint:
+                OrderRecord.Cover('Sell', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], OrderRecord.GetOpenInterest())
+                continue
+
+        # 空單出場
+        elif OrderRecord.GetOpenInterest() < 0:
+            if KBar_df['product'][n+1] != KBar_df['product'][n]:
+                OrderRecord.Cover('Buy', KBar_df['product'][n], KBar_df['time'][n], KBar_df['close'][n], -OrderRecord.GetOpenInterest())
+                continue
+            if KBar_df['close'][n] + MoveStopLoss < StopLossPoint:
+                StopLossPoint = KBar_df['close'][n] + MoveStopLoss
+            elif KBar_df['close'][n] > StopLossPoint:
+                OrderRecord.Cover('Buy', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], -OrderRecord.GetOpenInterest())
+                continue
+
+    ##### 繪圖
+    ChartOrder_MA(KBar_df, OrderRecord.GetTradeRecord())
+
+
 
 ##### 繪製K線圖加上MA以及下單點位
 # @st.cache_data(ttl=3600, show_spinner="正在加載資料...")  ## Add the caching decorator
