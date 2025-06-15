@@ -1198,7 +1198,7 @@ if choice_strategy == choices_strategies[0]:
 	    results = []
 	
 	    for short in range(short_range[0], short_range[1] + 1):
-		for long in range(long_range[0], long_range[1] + 1):
+	        for long in range(long_range[0], long_range[1] + 1):
 		    if short >= long:
 			continue
 		    for sl in range(stoploss_range[0], stoploss_range[1] + 1, 5):  # 停損每5點一格
