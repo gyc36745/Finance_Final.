@@ -31,8 +31,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 from datetime import datetime, date, time
 import plotly.graph_objects as go
-import itertools
-from itertools import product
+
 
 
 #%%
@@ -1100,7 +1099,8 @@ OrderRecord.GeneratorProfit_rateChart(StrategyName='MA')
 
 st.markdown("---")
 st.subheader("策略參數最佳化")
-
+import itertools
+from itertools import product
 
 if choice_strategy == choices_strategies[0]:	
 	#short_range = range(3, 10)
@@ -1132,8 +1132,8 @@ if choice_strategy == choices_strategies[0]:
 	st.markdown("<h5>選取要試的參數範圍</h5>", unsafe_allow_html=True)
 	short_range = st.slider("短均線範圍", 1, 100, (5, 10))
 	long_range = st.slider("長均線範圍", 1, 100, (20, 30))
-	#sl_value = st.slider("移動停損點數", min_value=1, max_value=100, value=30)
-	#sl_values = [sl_value]
+	sl_value = st.slider("移動停損點數", min_value=1, max_value=100, value=30)
+	sl_values = [sl_value]
 	optimize = st.button("執行窮舉最佳化")
 	#st.sidebar.header("最佳化參數尋找範圍")
 	#short_range = st.sidebar.slider("短均線範圍", 1, 100, (5, 10))
@@ -1141,7 +1141,7 @@ if choice_strategy == choices_strategies[0]:
 	##sl_values = st.sidebar.multiselect("移動停損點數", [5, 10, 15, 20], default=[10])
 	#sl_value = st.sidebar.slider("移動停損點數", min_value=1, max_value=100, value=30)
 	#sl_values = [sl_value]
-	stoploss_range = st.slider("移動停損點數範圍", min_value=1, max_value=100, value=(10, 30))
+	#stoploss_range = st.slider("移動停損點數範圍", min_value=1, max_value=100, value=(10, 30))
 	
 	#optimize = st.sidebar.button("執行窮舉最佳化")
 	
