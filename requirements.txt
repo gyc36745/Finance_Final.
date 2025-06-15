@@ -9,5 +9,6 @@ plotly
 mplfinance
 shioaji
 pynacl
+order_streamlit
 
 #TA-Lib
