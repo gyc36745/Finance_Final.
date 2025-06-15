@@ -368,6 +368,12 @@ def calculate_vwap(df):
     return df
 KBar_df = calculate_vwap(KBar_df)
 
+def calculate_vwap(df):
+    q = df['volume']  # 成交量
+    p = (df['high'] + df['low'] + df['close']) / 3  # 典型價格
+    vwap = (p * q).cumsum() / q.cumsum()
+    return vwap
+
 #------------------------------------EMA
 def calculate_ema(df, period=12):
     df[f'EMA_{period}'] = df['close'].ewm(span=period, adjust=False).mean()
@@ -513,7 +519,7 @@ with st.expander("K線圖, VWAP"):
     fig_vwap.add_trace(go.Scatter(x=KBar_df['time'], y=KBar_df['VWAP'], mode='lines', name='VWAP', line=dict(color='purple')), secondary_y=True)
     st.plotly_chart(fig_vwap, use_container_width=True)
 
-#EMA
+
 
 
 
@@ -707,7 +713,7 @@ if choice_strategy == choices_strategies[1]:  # VWAP 策略
         Order_Quantity = st.slider('設定下單數量（股票張數 / 期貨口數）', 1, 100, 1, key='VWAP_Qty')
 
     ##### 計算 VWAP
-    KBar_df['VWAP'] = calculate_vwap(KBar_df)
+    KBar_df = calculate_vwap(KBar_df)
 
     ##### 建立部位管理物件
     OrderRecord = Record()
