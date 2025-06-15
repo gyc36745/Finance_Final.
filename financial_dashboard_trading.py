@@ -391,7 +391,7 @@ import pandas as pd
 
 
 ###### K線圖, 移動平均線MA
-with st.expander("K線圖, 移動平均線MA"):
+with st.expander("K線圖, 移動平均線 (MA)"):
     fig1 = make_subplots(specs=[[{"secondary_y": True}]])
     fig1.update_layout(yaxis=dict(fixedrange=False,  # 允許y軸縮放
                                   autorange=True    # 自動調整範圍
@@ -417,7 +417,7 @@ with st.expander("K線圖, 移動平均線MA"):
     st.plotly_chart(fig1, use_container_width=True)
 
 #K線圖, 指數移動平均線EMA
-with st.expander("K線圖, 指數移動平均線EMA"):
+with st.expander("K線圖, 指數移動平均線 (EMA)"):
     fig_ema = make_subplots(specs=[[{"secondary_y": True}]])
     fig_ema.add_trace(go.Candlestick(x=KBar_df['time'],
                                      open=KBar_df['open'], high=KBar_df['high'],
