@@ -360,8 +360,12 @@ if len(nan_indexes_MACD) > 0:
 else:
     last_nan_index_MACD = 0
 
-
-
+#---------------------------------------VWAP
+def calculate_vwap(df):
+    typical_price = (df['high'] + df['low'] + df['close']) / 3
+    vwap = (typical_price * df['volume']).cumsum() / df['volume'].cumsum()
+    df['VWAP'] = vwap
+    return df
 
 # ####### (5) 將 Dataframe 欄位名稱轉換(第一個字母大寫)  ####### 
 # KBar_df_original = KBar_df
@@ -480,6 +484,17 @@ with st.expander("MACD(異同移動平均線)"):
     
     fig4.layout.yaxis2.showgrid=True
     st.plotly_chart(fig4, use_container_width=True)
+
+#VWAP
+with st.expander("K線圖 + VWAP"):
+    fig_vwap = make_subplots(specs=[[{"secondary_y": True}]])
+    fig_vwap.add_trace(go.Candlestick(x=KBar_df['time'],
+                                      open=KBar_df['open'], high=KBar_df['high'],
+                                      low=KBar_df['low'], close=KBar_df['close'], name='K線'),
+                       secondary_y=True)
+    fig_vwap.add_trace(go.Scatter(x=KBar_df['time'], y=KBar_df['VWAP'], mode='lines', name='VWAP', line=dict(color='purple')), secondary_y=True)
+    st.plotly_chart(fig_vwap, use_container_width=True)
+
 
 
 
