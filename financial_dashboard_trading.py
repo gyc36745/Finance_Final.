@@ -1103,9 +1103,9 @@ import itertools
 from itertools import product
 
 if choice_strategy == choices_strategies[0]:	
-	short_range = range(3, 10)
-	long_range = range(10, 30, 5)
-	stoploss_range = [5, 10, 15]
+	#short_range = range(3, 10)
+	#long_range = range(10, 30, 5)
+	#stoploss_range = [5, 10, 15]
 	
 	best_profit = -float('inf')
 	best_params = None
@@ -1132,8 +1132,8 @@ if choice_strategy == choices_strategies[0]:
 	st.markdown("<h5>選取要試的參數範圍</h5>", unsafe_allow_html=True)
 	short_range = st.slider("短均線範圍", 1, 100, (5, 10))
 	long_range = st.slider("長均線範圍", 1, 100, (20, 30))
-	sl_value = st.slider("移動停損點數", min_value=1, max_value=100, value=30)
-	sl_values = [sl_value]
+	#sl_value = st.slider("移動停損點數", min_value=1, max_value=100, value=30)
+	#sl_values = [sl_value]
 	optimize = st.button("執行窮舉最佳化")
 	#st.sidebar.header("最佳化參數尋找範圍")
 	#short_range = st.sidebar.slider("短均線範圍", 1, 100, (5, 10))
@@ -1149,6 +1149,7 @@ if choice_strategy == choices_strategies[0]:
 	#st.subheader("原始 K 線資料")
 	#st.dataframe(KBar_df.head())
 	# -- 執行最佳化邏輯 --
+	'''
 	if optimize:
 	    best_profit = -np.inf
 	    best_params = None
@@ -1186,6 +1187,47 @@ if choice_strategy == choices_strategies[0]:
 	    ).interactive()
 	
 	    st.altair_chart(chart, use_container_width=True)
+     '''
+		# 讓使用者用範圍滑桿選停損範圍（用元組）
+	stoploss_range = st.slider("移動停損點數範圍", min_value=1, max_value=100, value=(10, 30))
+	
+	
+	if optimize:
+	    best_profit = -np.inf
+	    best_params = None
+	    results = []
+	
+	    for short in range(short_range[0], short_range[1] + 1):
+		for long in range(long_range[0], long_range[1] + 1):
+		    if short >= long:
+			continue
+		    for sl in range(stoploss_range[0], stoploss_range[1] + 1, 5):  # 停損每5點一格
+			record = Record()
+			df_copy = KBar_df.copy()
+			run_strategy(df_copy, short, long, sl, record)
+			profit = record.GetTotalProfit()
+			results.append((short, long, sl, profit))
+	
+			if profit > best_profit:
+			    best_profit = profit
+			    best_params = (short, long, sl)
+	
+	    st.success(f"最佳參數：短MA={best_params[0]}, 長MA={best_params[1]}, 停損={best_params[2]}，總獲利={best_profit:.2f}")
+	
+	    df_result = pd.DataFrame(results, columns=["short_MA", "long_MA", "StopLoss", "TotalProfit"])
+	    st.subheader("所有參數組合績效")
+	    st.dataframe(df_result.sort_values(by="TotalProfit", ascending=False).reset_index(drop=True))
+	
+	    import altair as alt
+	    chart = alt.Chart(df_result).mark_circle(size=60).encode(
+		x='short_MA:Q',
+		y='long_MA:Q',
+		color='TotalProfit:Q',
+		tooltip=['short_MA', 'long_MA', 'StopLoss', 'TotalProfit']
+	    ).interactive()
+	
+	    st.altair_chart(chart, use_container_width=True)
+
 
 
 if choice_strategy == choices_strategies[1]:  # VWAP 策略
