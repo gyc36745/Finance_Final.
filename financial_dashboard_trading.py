@@ -1266,7 +1266,7 @@ if choice_strategy == choices_strategies[0]:
 	    st.altair_chart(chart, use_container_width=True)
 
 
-if optimize and choice_strategy == choices_strategies[1]:  # VWAP 策略
+if  choice_strategy == choices_strategies[1]:  # VWAP 策略
     best_profit = -np.inf
     best_params = None
     results = []
