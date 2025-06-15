@@ -341,37 +341,60 @@ class Record():
         st.pyplot(plt)
 
 def run_strategy(KBar_df, short_period, long_period, MoveStopLoss, OrderRecord):
+    # 計算移動平均線
     KBar_df['MA_short'] = KBar_df['close'].rolling(window=short_period).mean()
     KBar_df['MA_long'] = KBar_df['close'].rolling(window=long_period).mean()
+
     Order_Quantity = 1
     StopLossPoint = 0
     OrderPrice = 0
+    OrderBS = ''  # 紀錄目前持倉方向：Buy or Sell
 
     for n in range(1, len(KBar_df['time']) - 1):
+        # 均線計算完成後再開始判斷
         if not np.isnan(KBar_df['MA_long'][n - 1]):
+            current_price = KBar_df['close'][n]
+            next_open = KBar_df['open'][n + 1]
+            next_time = KBar_df['time'][n + 1]
+            product = KBar_df['product'][n + 1]
+
+            # 無部位 → 判斷進場訊號
             if OrderRecord.GetOpenInterest() == 0:
+                # 多單進場：黃金交叉
                 if KBar_df['MA_short'][n - 1] <= KBar_df['MA_long'][n - 1] and KBar_df['MA_short'][n] > KBar_df['MA_long'][n]:
-                    OrderRecord.Order('Buy', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], Order_Quantity)
-                    OrderPrice = KBar_df['open'][n+1]
+                    OrderRecord.Order('Buy', product, next_time, next_open, Order_Quantity)
+                    OrderPrice = next_open
                     StopLossPoint = OrderPrice - MoveStopLoss
+                    OrderBS = 'Buy'
                     continue
+
+                # 空單進場：死亡交叉
                 if KBar_df['MA_short'][n - 1] >= KBar_df['MA_long'][n - 1] and KBar_df['MA_short'][n] < KBar_df['MA_long'][n]:
-                    OrderRecord.Order('Sell', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], Order_Quantity)
-                    OrderPrice = KBar_df['open'][n+1]
+                    OrderRecord.Order('Sell', product, next_time, next_open, Order_Quantity)
+                    OrderPrice = next_open
                     StopLossPoint = OrderPrice + MoveStopLoss
+                    OrderBS = 'Sell'
                     continue
-            elif OrderRecord.GetOpenInterest() > 0:
-                if KBar_df['close'][n] - MoveStopLoss > StopLossPoint:
-                    StopLossPoint = KBar_df['close'][n] - MoveStopLoss
-                elif KBar_df['close'][n] < StopLossPoint:
-                    OrderRecord.Cover('Sell', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], OrderRecord.GetOpenInterest())
-                    continue
-            elif OrderRecord.GetOpenInterest() < 0:
-                if KBar_df['close'][n] + MoveStopLoss < StopLossPoint:
-                    StopLossPoint = KBar_df['close'][n] + MoveStopLoss
-                elif KBar_df['close'][n] > StopLossPoint:
-                    OrderRecord.Cover('Buy', KBar_df['product'][n+1], KBar_df['time'][n+1], KBar_df['open'][n+1], -OrderRecord.GetOpenInterest())
-                    continue
+
+            # 有部位 → 移動停損
+            elif OrderRecord.GetOpenInterest() != 0:
+                if OrderBS == 'Buy':
+                    # 移動停損更新
+                    if current_price - MoveStopLoss > StopLossPoint:
+                        StopLossPoint = current_price - MoveStopLoss
+                    # 出場
+                    elif current_price < StopLossPoint:
+                        OrderRecord.Cover('Sell', product, next_time, next_open, Order_Quantity)
+                        OrderBS = ''
+                        continue
+
+                elif OrderBS == 'Sell':
+                    if current_price + MoveStopLoss < StopLossPoint:
+                        StopLossPoint = current_price + MoveStopLoss
+                    elif current_price > StopLossPoint:
+                        OrderRecord.Cover('Buy', product, next_time, next_open, Order_Quantity)
+                        OrderBS = ''
+                        continue
     
         
         
