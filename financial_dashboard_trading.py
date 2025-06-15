@@ -1207,7 +1207,7 @@ if choice_strategy == choices_strategies[1]:  # VWAP 策略
             for sl in range(stoploss_range[0], stoploss_range[1] + 1, 5):  # 每 5 點一格
                 record = Record()
                 df_copy = KBar_df.copy()
-                run_strategy_VWAP(df_copy, offset, sl, record, order_qty)
+		run_strategy_VWAP(df_copy, offset, sl, order_qty, record)
                 profit = record.GetTotalProfit()
                 results.append((offset, sl, profit))
 
