@@ -522,8 +522,8 @@ if page == "首頁":
 	    fig_vwap.add_trace(go.Scatter(x=KBar_df['time'], y=KBar_df['VWAP'], mode='lines', name='VWAP', line=dict(color='purple')), secondary_y=True)
 	    st.plotly_chart(fig_vwap, use_container_width=True)
 	
-		
-	elif page == "程式交易":
+#==========================================================================================================================================================	
+elif page == "程式交易":
 	#%%
 	####### (6) 程式交易 #######
 	st.markdown("---")
