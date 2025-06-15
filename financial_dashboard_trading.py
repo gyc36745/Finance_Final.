@@ -1201,16 +1201,16 @@ if choice_strategy == choices_strategies[0]:
 	        for long in range(long_range[0], long_range[1] + 1):
 	            if short >= long:
 	                continue
-		    for sl in range(stoploss_range[0], stoploss_range[1] + 1, 5):  # 停損每5點一格
-			record = Record()
-			df_copy = KBar_df.copy()
-			run_strategy(df_copy, short, long, sl, record)
-			profit = record.GetTotalProfit()
-			results.append((short, long, sl, profit))
+	            for sl in range(stoploss_range[0], stoploss_range[1] + 1, 5):  # 停損每5點一格
+	                record = Record()
+	                df_copy = KBar_df.copy()
+	                run_strategy(df_copy, short, long, sl, record)
+	                profit = record.GetTotalProfit()
+	                results.append((short, long, sl, profit))
 	
-			if profit > best_profit:
-			    best_profit = profit
-			    best_params = (short, long, sl)
+	                if profit > best_profit:
+	                    best_profit = profit
+	                    best_params = (short, long, sl)
 	
 	    st.success(f"最佳參數：短MA={best_params[0]}, 長MA={best_params[1]}, 停損={best_params[2]}，總獲利={best_profit:.2f}")
 	
